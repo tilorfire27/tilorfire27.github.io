@@ -132,7 +132,7 @@ epg += equipmentList[x].stat1value *
 (equipmentList[x].rarity +
 equipmentList[x].mark);
 }
-messageData += '<tr><td><div class="imageWrapper"><img class="overlayImage" src="'
+messageData += '<tr><td><div class="imageWrapper"><img class="overlayImage" src="img/'
 if (equipmentList[x].icon != undefined) {
 messageData += equipmentList[x].icon;
 }
@@ -140,7 +140,7 @@ else
 {
 messageData += "Common_icon.png";
 }
-messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="' +
+messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/' +
 rarityIcons[equipmentList[x].rarity-1] +
 '" alt="Rarity" width="49" height="64"></div></td><td>';
 messageData += equipmentList[x].name + " " +
