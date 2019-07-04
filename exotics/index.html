@@ -12,7 +12,6 @@
   margin: auto;
 }
 table {
-width: 1px;
   text-align: left;
   border: 1px solid black;
 }
@@ -37,7 +36,7 @@ td {
 
 <button type="button"
 onclick="listEntries()">
-Click me to display what data is currently available.</button>
+Click me to display random equipment</button>
 <p id="demo"></p>
 <script>
 function listEntries() {
@@ -66,21 +65,6 @@ MARK_AND_RARITY: "Mark and Rarity"
 };
 var defaultMark = 15;
 var equipmentList = [ ];
-equipmentList.push({name:"Console - Science - Particle Generator",
-mark:defaultMark,
-rarity:rarity.EPIC,
-icon:"Console_-_Science_-_Particle_Generator_icon.png",
-stat1:stats.EPG,
-stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
-
-equipmentList.push({name:"Console - Science - Temporally Shielded Datacore",
-mark:defaultMark,
-rarity:rarity.EPIC,
-icon:"Console_-_Science_-_Temporally_Shielded_Datacore_icon.png",
-stat1:stats.EPG,
-stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.25});
 
 equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
 mark:defaultMark,
@@ -102,6 +86,14 @@ equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [not
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.875});
+
+equipmentList.push({name:"Console - Science - Particle Generator",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"Console_-_Science_-_Particle_Generator_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
 stat1value:1.875});
@@ -128,7 +120,10 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Exotic_Particle_Focuser_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
+stat1value:1.875,
+stat2:stats.Cat1_EXOTIC,
+stat2type:statScaling.FIXED,
+stat2value:0.3});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Secondary]",
 mark:defaultMark,
@@ -136,7 +131,34 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Exotic_Particle_Focuser_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.25,
+stat2:stats.Cat1_EXOTIC,
+stat2type:statScaling.FIXED,
+stat2value:0.3});
+
+equipmentList.push({name:"Console - Science - Temporally Shielded Datacore",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"Console_-_Science_-_Temporally_Shielded_Datacore_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
 stat1value:1.25});
+
+equipmentList.push({name:"Console - Tactical - Chronometric Capacitor",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"Console_-_Tactical_-_Chronometric_Capacitor_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.875});
+
+equipmentList.push({name:"Console - Universal - Auxiliary Ejection Assembly",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.178});
 
 var len = equipmentList.length;
 
@@ -145,7 +167,7 @@ equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
 }
 
 var epg = 0;
-var messageData = "<table><tr><th>Icon.....</th><th>Info</th></tr>";
+var messageData = "<table><tr><th>Icon</th><th>Info</th></tr>";
 for (var x = 0; x < len; x++) {
 if (equipmentList[x].stat1 = stats.EPG) {
 epg += equipmentList[x].stat1value *
@@ -160,6 +182,7 @@ else
 {
 messageData += "Common_icon.png";
 }
+
 messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/' +
 rarityIcons[equipmentList[x].rarity-1] +
 '" alt="Rarity" width="49" height="64"></div></td><td>';
