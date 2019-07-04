@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.imageWrapper {
+  position: relative;
+}
+.overlayImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: auto;
+}
+table {
+width: 1px;
+  text-align: left;
+  border: 1px solid black;
+}
+th {
+    width: 49px;
+    height: 15px;
+    border: 1px solid black;
+    white-space:nowrap;
+}
+td {
+    width: 49px;
+    height: 64px;
+    vertical-align: top;
+    border: 1px solid black;
+    white-space:nowrap;
+}
+</style>
+</head>
+<body>
+
+<h2>JavaScript Testbed</h2>
+
+<button type="button"
+onclick="listEntries()">
+Click me to display what data is currently available.</button>
+<p id="demo"></p>
+<script>
+function listEntries() {
+const rarity = {
+COMMON: 1,
+UNCOMMON: 2,
+RARE: 3,
+VERY_RARE: 4,
+ULTRA_RARE: 5,
+EPIC: 6
+};
+var rarityIcons = ["Common_icon.png", "Uncommon_icon.png", "Rare_icon.png", "Very_rare_icon.png", "Ultra_rare_icon.png", "Epic_icon.png"];
+const stats = {
+EPG: "Exotic Particle Generator",
+Cat1_EXOTIC: "Cat1 Exotic Damage",
+Cat2_EXOTIC: "Cat2 Exotic Damage",
+CrtD_EXOTIC: "Critical Damage - Exotic",
+CrtH_EXOTIC: "Critical Hit Chance - Exotic",
+AUX_POWER: "Auxiliary Power",
+MAX_AUX_POWER: "Auxiliary Power Capacity Increase"
+};
+const statScaling = {
+FIXED: "Fixed",
+MARK_ONLY: "Mark Only",
+MARK_AND_RARITY: "Mark and Rarity"
+};
+var defaultMark = 15;
+var equipmentList = [ ];
+equipmentList.push({name:"Console - Science - Particle Generator",
+mark:defaultMark,
+rarity:rarity.EPIC,
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.875});
+
+equipmentList.push({name:"Console - Science - Temporally Shielded Datacore",
+mark:defaultMark,
+rarity:rarity.EPIC,
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.25});
+
+equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"Console_-_Engineering_-_Conductive_RCS_Accelerator_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.875});
+
+equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [EPG]",
+mark:defaultMark,
+rarity:rarity.EPIC,
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:3.75});
+
+equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [not-EPG]",
+mark:defaultMark,
+rarity:rarity.EPIC,
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.875});
+
+equipmentList.push({name:"Console - Science - Shield Refrequencer [EPG]",
+mark:defaultMark,
+rarity:rarity.EPIC,
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.25});
+
+equipmentList.push({name:"Console - Science - Threat Scaling Console",
+mark:defaultMark,
+rarity:rarity.EPIC,
+stat1:stats.EPG,
+stat1type:statScaling.MARK_AND_RARITY,
+stat1value:1.875});
+
+for (var bloop = 1; bloop < 7; bloop++) {
+equipmentList[bloop-1].rarity = bloop;
+}
+
+var len = equipmentList.length;
+var epg = 0;
+var messageData = "<table><tr><th>Icon.....</th><th>Info</th></tr>";
+for (var x = 0; x < len; x++) {
+if (equipmentList[x].stat1 = stats.EPG) {
+epg += equipmentList[x].stat1value *
+(equipmentList[x].rarity +
+equipmentList[x].mark);
+}
+messageData += '<tr><td><div class="imageWrapper"><img class="overlayImage" src="'
+if (equipmentList[x].icon != undefined) {
+messageData += equipmentList[x].icon;
+}
+else
+{
+messageData += "Common_icon.png";
+}
+messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="' +
+rarityIcons[equipmentList[x].rarity-1] +
+'" alt="Rarity" width="49" height="64"></div></td><td>';
+messageData += equipmentList[x].name + " " +
+equipmentList[x].stat1value *
+(equipmentList[x].rarity +
+equipmentList[x].mark) +
+'</td></tr>';
+}
+messageData += '</table>' + epg;
+document.getElementById('demo').innerHTML = messageData;
+//document.getElementById('demo').innerHTML = rarityIcons[equipmentList[0].rarity];
+
+}
+</script>
+
+</body>
+</html>
+
