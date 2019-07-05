@@ -50,13 +50,13 @@ EPIC: 6
 };
 var rarityIcons = ["Common_icon.png", "Uncommon_icon.png", "Rare_icon.png", "Very_rare_icon.png", "Ultra_rare_icon.png", "Epic_icon.png"];
 const stats = {
-EPG: "Exotic Particle Generator",
-Cat1_EXOTIC: "Cat1 Exotic Damage",
-Cat2_EXOTIC: "Cat2 Exotic Damage",
-CrtD_EXOTIC: "Critical Damage - Exotic",
-CrtH_EXOTIC: "Critical Hit Chance - Exotic",
-AUX_POWER: "Auxiliary Power",
-MAX_AUX_POWER: "Auxiliary Power Capacity Increase"
+EPG: 0,//"Exotic Particle Generator",
+Cat1_EXOTIC: 1,//"Cat1 Exotic Damage",
+Cat2_EXOTIC: 2,//"Cat2 Exotic Damage",
+CrtD_EXOTIC: 3,//"Critical Damage - Exotic",
+CrtH_EXOTIC: 4,//"Critical Hit Chance - Exotic",
+AUX_POWER: 5,//"Auxiliary Power",
+MAX_AUX_POWER: 6,//"Auxiliary Power Capacity Increase"
 };
 const statScaling = {
 FIXED: "Fixed",
@@ -65,6 +65,7 @@ MARK_AND_RARITY: "Mark and Rarity"
 };
 var defaultMark = 15;
 var equipmentList = [ ];
+var maxStats = 2
 
 equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
 mark:defaultMark,
@@ -160,19 +161,46 @@ stat1:stats.Cat2_EXOTIC,
 stat1type:statScaling.FIXED,
 stat1value:0.178});
 
+equipmentList.push({name:"Console - Universal - Disruption Pulse Emitter",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"Console_-_Universal_-_Disruption_Pulse_Emitter_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.FIXED,
+stat1value:0.20});
+
 var len = equipmentList.length;
 
 for (var bloop = 0; bloop < len; bloop++) {
 equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
 }
 
-var epg = 0;
+var totalStats=[0,0,0,0,0,0,0,0,0];
 var messageData = "<table><tr><th>Icon</th><th>Info</th></tr>";
 for (var x = 0; x < len; x++) {
-if (equipmentList[x].stat1 = stats.EPG) {
-epg += equipmentList[x].stat1value *
-(equipmentList[x].rarity +
-equipmentList[x].mark);
+switch(equipmentList[x].stat1type) {
+case statScaling.MARK_AND_RARITY:
+totalStats[equipmentList[x].stat1] += equipmentList[x].stat1value * (equipmentList[x].rarity + equipmentList[x].mark);
+break;
+case statScaling.MARK_ONLY:
+totalStats[equipmentList[x].stat1] += equipmentList[x].stat1value * (1 + equipmentList[x].mark);
+break;
+case statScaling.FIXED:
+totalStats[equipmentList[x].stat1] += equipmentList[x].stat1value;
+break;
+default:
+}
+switch(equipmentList[x].stat2type) {
+case statScaling.MARK_AND_RARITY:
+totalStats[equipmentList[x].stat2] += equipmentList[x].stat2value * (equipmentList[x].rarity + equipmentList[x].mark);
+break;
+case statScaling.MARK_ONLY:
+totalStats[equipmentList[x].stat2] += equipmentList[x].stat2value * (1 + equipmentList[x].mark);
+break;
+case statScaling.FIXED:
+totalStats[equipmentList[x].stat2] += equipmentList[x].stat2value;
+break;
+default:
 }
 messageData += '<tr><td><div class="imageWrapper"><img class="overlayImage" src="img/'
 if (equipmentList[x].icon != undefined) {
@@ -186,13 +214,11 @@ messageData += "Common_icon.png";
 messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/' +
 rarityIcons[equipmentList[x].rarity-1] +
 '" alt="Rarity" width="49" height="64"></div></td><td>';
-messageData += equipmentList[x].name + " " +
-equipmentList[x].stat1value *
-(equipmentList[x].rarity +
-equipmentList[x].mark) +
-'</td></tr>';
+messageData += equipmentList[x].name + '</td></tr>';
 }
-messageData += '</table>' + epg;
+messageData += '</table>' + "EPG: " + totalStats[0] +
+"<br>Cat1: " + totalStats[1] + 
+"<br>Cat2: " + totalStats[2];
 document.getElementById('demo').innerHTML = messageData;
 //document.getElementById('demo').innerHTML = rarityIcons[equipmentList[0].rarity];
 
