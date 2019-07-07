@@ -16,24 +16,55 @@ table {
   border: 1px solid black;
 }
 th {
-    width: 49px;
+    width: 61px;
     height: 15px;
     border: 1px solid black;
     white-space:nowrap;
 }
 td {
-    width: 49px;
-    height: 64px;
+    width: 61px;
+    height: 76px;
     vertical-align: top;
     border: 1px solid black;
     white-space:nowrap;
 }
+.card {
+ /*This is the actual background*/
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  width:600px;
+  border-radius: 5px; 
+  background: #000000;
+  color: #FFFFFF;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Add some padding inside the card container */
+.container {
+  padding: 2px 8px;
+  width:550px;
+  height: 72px;
+}
+img {
+	padding: 6px;
+	
+}
+
 </style>
 </head>
-<body>
+<body onLoad="listEntries()">
 
 <h2>JavaScript Testbed</h2>
-
+<div class="card">
+	<div class="imageWrapper"><img class="overlayImage" src="img/Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/Uncommon_icon.png" alt="Rarity" width="49" height="64"></div>
+		<div class="container">
+			<p style="margin-left: 55px">This is a cool box</p>
+		</div>
+</div>
+<br>
 <button type="button"
 onclick="listEntries()">
 Click me to display random equipment</button>
@@ -214,14 +245,19 @@ messageData += "Common_icon.png";
 messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/' +
 rarityIcons[equipmentList[x].rarity-1] +
 '" alt="Rarity" width="49" height="64"></div></td><td>';
-messageData += equipmentList[x].name + '</td></tr>';
+messageData += equipmentList[x].name + 
+//'<input type="checkbox" name="item' + x + '" value="selItem' + x + '">' +
+'</td></tr>';
+
 }
 messageData += '</table>' + "EPG: " + totalStats[0] +
 "<br>Cat1: " + totalStats[1] + 
 "<br>Cat2: " + totalStats[2];
 document.getElementById('demo').innerHTML = messageData;
 //document.getElementById('demo').innerHTML = rarityIcons[equipmentList[0].rarity];
-
+var cBox = document.createElement("INPUT");
+cBox.setAttribute("type", "checkbox");
+document.body.appendChild(cBox);
 }
 </script>
 
