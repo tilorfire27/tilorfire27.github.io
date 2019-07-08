@@ -32,7 +32,6 @@ td {
  /*This is the actual background*/
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   transition: 0.3s;
-  width:600px;
   border-radius: 5px; 
   background: #000000;
   color: #FFFFFF;
@@ -45,50 +44,40 @@ td {
 /* Add some padding inside the card container */
 .container {
   padding: 2px 8px;
-  width:550px;
   height: 72px;
 }
 img {
 	padding: 6px;
 	
 }
+/* Create three equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 45%;
+  padding: 15px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+@media screen and (max-width:1150px) {
+  .column {
+    width: 550px;
+  }
+}
 
 </style>
 </head>
 <body onLoad="listEntries()">
 
-<h2>JavaScript Testbed</h2>
-<div class="card" id="card1" onClick="flipColor('card1')">
-	<div class="imageWrapper"><img class="overlayImage" src="img/Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/Epic_icon.png" alt="Rarity" width="49" height="64"></div>
-		<div class="container">
-			<p style="margin-left: 55px">This is a cool box</p>
-		</div>
-</div>
-<br>
-<div class="card" id="card2">
-	<div class="imageWrapper"><img class="overlayImage" src="img/Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/Epic_icon.png" alt="Rarity" width="49" height="64"></div>
-		<div class="container">
-			<p style="margin-left: 55px">This is a cool box</p>
-		</div>
-</div>
-<br>
-<button type="button"
-onclick="listEntries()">
-Click me to display random equipment</button>
-<p id="demo"></p>
+<h2>Exotic Damage Calculator</h2>
+<p id="statCollection"></p>
+<p id="items"></p>
 <script>
-function flipColor(id) {
-	if (S(id) == '#FFFFFF') {
-	S(id, 'background', '777777');
-	}
-	else if (S(id) == '#777777') {
-	S(id, 'background', '#FFFFFF');
-	}
-	else {
-	S(id, 'background', '#FFFFFF');
-	}
-}
-function listEntries() {
+var totalStats=[0,0,0,0,0,0,0,0,0];
 const rarity = {
 COMMON: 1,
 UNCOMMON: 2,
@@ -112,7 +101,8 @@ FIXED: "Fixed",
 MARK_ONLY: "Mark Only",
 MARK_AND_RARITY: "Mark and Rarity"
 };
-var defaultMark = 15;
+const ROMAN = [null,"_I_","_II_","_III_","_IV_","_V_","_VI_","_VII_","_VIII_","_IX_","_X_","_XI_","_XII_","_XIII_","_XIV_","_XV_","inf"];
+var defaultMark = 13;
 var equipmentList = [ ];
 var maxStats = 2
 
@@ -218,109 +208,167 @@ stat1:stats.EPG,
 stat1type:statScaling.FIXED,
 stat1value:0.20});
 
+
+function flipColor(cardID) {
+
+	var backString = cardID.style.background;
+	backString = backString.slice(4, backString.indexOf(")"));
+	var seld;
+	//if (cardID.innerHTML == equipmentList[0].name) {
+	//	cardID.style.background = '#22CC22';
+	//}
+	if (backString == "0, 0, 0") {
+		cardID.style.background = '#2222CC';
+		seld = 1;
+	}
+	else {
+		cardID.style.background = '#000000';
+		seld = -1;
+	}
+	//alert(cardID.innerHTML.indexOf(equipmentList[0].name));
+	for (var x = 0; x < equipmentList.length; x++) {
+		if(cardID.innerHTML.indexOf(equipmentList[x].name) > -1) {
+			sumStats(x,seld);
+		}
+	}
+	updateTotals();
+}
+function rarClick(cardID,event) {
+	event.stopPropagation();
+var mainCard = cardID.parentNode.parentNode.parentNode;
+var rarityUP = (cardID.value == "Upgrade Rarity");
+var rarityCurrent;
+var rarityNew;
+	var backString = mainCard.style.background;
+	backString = backString.slice(4, backString.indexOf(")"));
+	if (backString != "0, 0, 0") {
+		flipColor(mainCard);
+	}
+	for (var x = 0; x < equipmentList.length; x++) {
+		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
+			rarityCurrent = equipmentList[x].rarity;
+		if (rarityUP) {
+			rarityNew = Math.min(rarityCurrent + 1, 6);
+			//alert("Power UP");
+		}
+		else if (!rarityUP) {
+			rarityNew = Math.max(rarityCurrent - 1, 1);
+			//alert("Power DOWN");
+		}
+		else {
+			alert("There is an error with rarity selection");
+		}
+		equipmentList[x].rarity = rarityNew;
+		mainCard.innerHTML = mainCard.innerHTML.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);
+		}
+	}
+	if (backString != "0, 0, 0") {
+		flipColor(mainCard);
+	}
+}
+function upgClick(cardID,event) {
+	event.stopPropagation();
+var mainCard = cardID.parentNode.parentNode.parentNode;
+var markUP = (cardID.value == "Upgrade Mk");
+var markCurrent;
+var markNew;
+	var backString = mainCard.style.background;
+	backString = backString.slice(4, backString.indexOf(")"));
+	if (backString != "0, 0, 0") {
+		flipColor(mainCard);
+	}
+	for (var x = 0; x < equipmentList.length; x++) {
+		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
+			markCurrent = equipmentList[x].mark;
+		if (markUP) {
+			markNew = Math.min(markCurrent + 1, 15);
+			//alert("Power UP");
+		}
+		else if (!markUP) {
+			markNew = Math.max(markCurrent - 1, 1);
+			//alert("Power DOWN");
+		}
+		else {
+			alert("There is an error with mark selection");
+		}
+		equipmentList[x].mark = markNew;
+		mainCard.innerHTML = mainCard.innerHTML.replace(ROMAN[markCurrent], ROMAN[markNew]);
+		//console.log(markNew);
+		}
+	}
+	if (backString != "0, 0, 0") {
+		flipColor(mainCard);
+	}
+}
+
+function sumStats(itemNum,seld) {
+			switch(equipmentList[itemNum].stat1type) {
+				case statScaling.MARK_AND_RARITY:
+				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].stat1value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+				break;
+				case statScaling.MARK_ONLY:
+				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].stat1value * (1 + equipmentList[itemNum].mark);
+				break;
+				case statScaling.FIXED:
+				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].stat1value;
+				break;
+				default:
+				}
+			switch(equipmentList[itemNum].stat2type) {
+				case statScaling.MARK_AND_RARITY:
+				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].stat2value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+				break;
+				case statScaling.MARK_ONLY:
+				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].stat2value * (1 + equipmentList[itemNum].mark);
+				break;
+				case statScaling.FIXED:
+				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].stat2value;
+				break;
+				default:
+				}
+}
+
+function listEntries() {
+
 var len = equipmentList.length;
+//This is just temporary to to limited testing before selection
+//for (var bloop = 1; bloop < len; bloop++) {
+//equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
+//}
 
-for (var bloop = 0; bloop < len; bloop++) {
-equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
-}
-
-var totalStats=[0,0,0,0,0,0,0,0,0];
-var messageData = "<table><tr><th>Icon</th><th>Info</th></tr>";
+var baseMessage = '<div class="row"><div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0) none repeat scroll 0% 0%"><div class="imageWrapper"><img class="overlayImage" src="img/ITEM_ICON" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/RARITY_ICON" alt="Rarity" width="49" height="64"><img class="overlayImage" src="img/MkMARK_ICONicon.png" alt="Mark" width="49" height="64"></div><div class="container"><p id="BLURBID" style="margin-left: 55px">BLURB<br><input type="button" value="Upgrade Mk" onClick="upgClick(this,event)"><input type="button" value="Downgrade Mk" onClick="upgClick(this,event)"><input type="button" value="Upgrade Rarity" onClick="rarClick(this,event)"><input type="button" value="Downgrade Rarity" onClick="rarClick(this,event)"></p></div></div><br></div>';
+var messageData = "";
 for (var x = 0; x < len; x++) {
-switch(equipmentList[x].stat1type) {
-case statScaling.MARK_AND_RARITY:
-totalStats[equipmentList[x].stat1] += equipmentList[x].stat1value * (equipmentList[x].rarity + equipmentList[x].mark);
-break;
-case statScaling.MARK_ONLY:
-totalStats[equipmentList[x].stat1] += equipmentList[x].stat1value * (1 + equipmentList[x].mark);
-break;
-case statScaling.FIXED:
-totalStats[equipmentList[x].stat1] += equipmentList[x].stat1value;
-break;
-default:
-}
-switch(equipmentList[x].stat2type) {
-case statScaling.MARK_AND_RARITY:
-totalStats[equipmentList[x].stat2] += equipmentList[x].stat2value * (equipmentList[x].rarity + equipmentList[x].mark);
-break;
-case statScaling.MARK_ONLY:
-totalStats[equipmentList[x].stat2] += equipmentList[x].stat2value * (1 + equipmentList[x].mark);
-break;
-case statScaling.FIXED:
-totalStats[equipmentList[x].stat2] += equipmentList[x].stat2value;
-break;
-default:
-}
-messageData += '<tr><td><div class="imageWrapper"><img class="overlayImage" src="img/'
+messageData += baseMessage;
+
+
+//Input the actual string and display card
 if (equipmentList[x].icon != undefined) {
-messageData += equipmentList[x].icon;
+messageData = messageData.replace("ITEM_ICON", equipmentList[x].icon);
 }
 else
 {
-messageData += "Common_icon.png";
+messageData = messageData.replace("ITEM_ICON", 'MissingNO_icon.png');
 }
-
-messageData += '" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/' +
-rarityIcons[equipmentList[x].rarity-1] +
-'" alt="Rarity" width="49" height="64"></div></td><td>';
-messageData += equipmentList[x].name + 
-//'<input type="checkbox" name="item' + x + '" value="selItem' + x + '">' +
-'</td></tr>';
-
+messageData = messageData.replace("RARITY_ICON", rarityIcons[equipmentList[x].rarity-1]);
+messageData = messageData.replace("BLURBID", "desc" + x);
+messageData = messageData.replace("BLURB", equipmentList[x].name);
+messageData = messageData.replace("MARK_ICON", ROMAN[equipmentList[x].mark]);
 }
-messageData += '</table>' + "EPG: " + totalStats[0] +
+document.getElementById('items').innerHTML = '<div class="column">' + messageData + '</div>';
+//dummy placeholder for the output powers
+document.getElementById('items').innerHTML += '<div class="column">' + 'Output Data<br>The results for powers will show up here' + '</div>';
+updateTotals();
+}
+function updateTotals() {
+var statData;
+statData = "EPG: " + totalStats[0] +
 "<br>Cat1: " + totalStats[1] + 
-"<br>Cat2: " + totalStats[2];
-document.getElementById('demo').innerHTML = messageData;
-//document.getElementById('demo').innerHTML = rarityIcons[equipmentList[0].rarity];
-//var cBox = document.createElement("INPUT");
-//cBox.setAttribute("type", "checkbox");
-//document.body.appendChild(cBox);
-}
-function O(id, property, value)
-{
-	if (id instanceof Array)
-	{
-		var tmp = []
-		for (var j = 0 ; j < id.length ; ++j)
-			tmp.push(O(id[j], property, value))
-		return tmp
-	}
-	if (typeof property != UNDEF && typeof value != UNDEF)
-	{
-		if (typeof value == 'string') value = "'" + value + "'"
-		return eval("O('" + id + "')." + property + " = " + value)
-	}
-	if (typeof id == 'object') return id
-	else
-	{
-		try { return document.getElementById(id) }
-		catch(e) { alert('JavaScript Plug-in - Unknown ID: ' + id) }
-	}
-}
-function S(id, property, value)
-{
-	if (id instanceof Array)
-	{
-		var tmp = []
-		for (var j = 0 ; j < id.length ; ++j)
-			tmp.push(S(id[j], property, value))
-		return tmp
-	}
-	if (typeof property != UNDEF && typeof value != UNDEF)
-	{
-		try { return O(id).style[property] = value }
-		catch(e) { alert('JavaScript Plug-in - Unknown ID: ' + id) }
-	}
-	else if (typeof id == 'object') return id.style
-	else
-	{
-		try { return O(id).style }
-		catch(e) { alert('JavaScript Plug-in - Unknown ID: ' + id) }
-	}
+"<br>Cat2: " + totalStats[2] + 
+"<br>";
+document.getElementById('statCollection').innerHTML = statData;
 }
 </script>
 
 </body>
 </html>
-
