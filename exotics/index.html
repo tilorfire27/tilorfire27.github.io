@@ -39,7 +39,7 @@ td {
 }
 
 .card:hover {
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
 }
 
 /* Add some padding inside the card container */
@@ -58,8 +58,15 @@ img {
 <body onLoad="listEntries()">
 
 <h2>JavaScript Testbed</h2>
-<div class="card">
-	<div class="imageWrapper"><img class="overlayImage" src="img/Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/Uncommon_icon.png" alt="Rarity" width="49" height="64"></div>
+<div class="card" id="card1" onClick="flipColor('card1')">
+	<div class="imageWrapper"><img class="overlayImage" src="img/Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/Epic_icon.png" alt="Rarity" width="49" height="64"></div>
+		<div class="container">
+			<p style="margin-left: 55px">This is a cool box</p>
+		</div>
+</div>
+<br>
+<div class="card" id="card2">
+	<div class="imageWrapper"><img class="overlayImage" src="img/Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/Epic_icon.png" alt="Rarity" width="49" height="64"></div>
 		<div class="container">
 			<p style="margin-left: 55px">This is a cool box</p>
 		</div>
@@ -70,6 +77,17 @@ onclick="listEntries()">
 Click me to display random equipment</button>
 <p id="demo"></p>
 <script>
+function flipColor(id) {
+	if (S(id) == '#FFFFFF') {
+	S(id, 'background', '777777');
+	}
+	else if (S(id) == '#777777') {
+	S(id, 'background', '#FFFFFF');
+	}
+	else {
+	S(id, 'background', '#FFFFFF');
+	}
+}
 function listEntries() {
 const rarity = {
 COMMON: 1,
@@ -255,9 +273,51 @@ messageData += '</table>' + "EPG: " + totalStats[0] +
 "<br>Cat2: " + totalStats[2];
 document.getElementById('demo').innerHTML = messageData;
 //document.getElementById('demo').innerHTML = rarityIcons[equipmentList[0].rarity];
-var cBox = document.createElement("INPUT");
-cBox.setAttribute("type", "checkbox");
-document.body.appendChild(cBox);
+//var cBox = document.createElement("INPUT");
+//cBox.setAttribute("type", "checkbox");
+//document.body.appendChild(cBox);
+}
+function O(id, property, value)
+{
+	if (id instanceof Array)
+	{
+		var tmp = []
+		for (var j = 0 ; j < id.length ; ++j)
+			tmp.push(O(id[j], property, value))
+		return tmp
+	}
+	if (typeof property != UNDEF && typeof value != UNDEF)
+	{
+		if (typeof value == 'string') value = "'" + value + "'"
+		return eval("O('" + id + "')." + property + " = " + value)
+	}
+	if (typeof id == 'object') return id
+	else
+	{
+		try { return document.getElementById(id) }
+		catch(e) { alert('JavaScript Plug-in - Unknown ID: ' + id) }
+	}
+}
+function S(id, property, value)
+{
+	if (id instanceof Array)
+	{
+		var tmp = []
+		for (var j = 0 ; j < id.length ; ++j)
+			tmp.push(S(id[j], property, value))
+		return tmp
+	}
+	if (typeof property != UNDEF && typeof value != UNDEF)
+	{
+		try { return O(id).style[property] = value }
+		catch(e) { alert('JavaScript Plug-in - Unknown ID: ' + id) }
+	}
+	else if (typeof id == 'object') return id.style
+	else
+	{
+		try { return O(id).style }
+		catch(e) { alert('JavaScript Plug-in - Unknown ID: ' + id) }
+	}
 }
 </script>
 
