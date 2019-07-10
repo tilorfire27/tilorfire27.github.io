@@ -11,23 +11,6 @@
   left: 0;
   margin: auto;
 }
-table {
-  text-align: left;
-  border: 1px solid black;
-}
-th {
-    width: 61px;
-    height: 15px;
-    border: 1px solid black;
-    white-space:nowrap;
-}
-td {
-    width: 61px;
-    height: 76px;
-    vertical-align: top;
-    border: 1px solid black;
-    white-space:nowrap;
-}
 .card {
  /*This is the actual background*/
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -43,12 +26,13 @@ td {
 
 /* Add some padding inside the card container */
 .container {
-  padding: 2px 8px;
-  height: 72px;
+  height: 76px;
+  	margin: 4px;
 }
 img {
 	padding: 6px;
-	
+	width: 49px;
+	height: 64px;	
 }
 /* Create three equal columns that floats next to each other */
 .column {
@@ -68,8 +52,12 @@ img {
     width: 550px;
   }
 }
+#number {
+	width: 3em;
+}
 
 </style>
+<title>Tilor's Exotic Damage Calculator</title>
 </head>
 <body onLoad="listEntries()">
 
@@ -102,9 +90,10 @@ MARK_ONLY: "Mark Only",
 MARK_AND_RARITY: "Mark and Rarity"
 };
 const ROMAN = [null,"_I_","_II_","_III_","_IV_","_V_","_VI_","_VII_","_VIII_","_IX_","_X_","_XI_","_XII_","_XIII_","_XIV_","_XV_","inf"];
-var defaultMark = 13;
+var defaultMark = 15;
+var defaultQty = 1;
 var equipmentList = [ ];
-var maxStats = 2
+var maxStats = 2;
 
 equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
 mark:defaultMark,
@@ -112,7 +101,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Engineering_-_Conductive_RCS_Accelerator_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
+stat1value:1.875,
+quantity:1,
+maxQty:1});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [EPG]",
 mark:defaultMark,
@@ -120,7 +111,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:3.75});
+stat1value:3.75,
+quantity:1,
+maxQty:1});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [not-EPG]",
 mark:defaultMark,
@@ -128,7 +121,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
+stat1value:1.875,
+quantity:1,
+maxQty:1});
 
 equipmentList.push({name:"Console - Science - Particle Generator",
 mark:defaultMark,
@@ -136,7 +131,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Particle_Generator_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
+stat1value:1.875,
+quantity:1,
+maxQty:6});
 
 equipmentList.push({name:"Console - Science - Shield Refrequencer [EPG]",
 mark:defaultMark,
@@ -144,7 +141,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Shield_Refrequencer_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.25});
+stat1value:1.25,
+quantity:1,
+maxQty:6});
 
 equipmentList.push({name:"Console - Science - Threat Scaling Console",
 mark:defaultMark,
@@ -152,7 +151,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Plasma-Generating_Weapon_Signature_Amplifier_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
+stat1value:1.875,
+quantity:1,
+maxQty:6});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Primary]",
 mark:defaultMark,
@@ -163,7 +164,9 @@ stat1type:statScaling.MARK_AND_RARITY,
 stat1value:1.875,
 stat2:stats.Cat1_EXOTIC,
 stat2type:statScaling.FIXED,
-stat2value:0.3});
+stat2value:0.075,
+quantity:1,
+maxQty:6});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Secondary]",
 mark:defaultMark,
@@ -174,7 +177,9 @@ stat1type:statScaling.MARK_AND_RARITY,
 stat1value:1.25,
 stat2:stats.Cat1_EXOTIC,
 stat2type:statScaling.FIXED,
-stat2value:0.3});
+stat2value:0.075,
+quantity:1,
+maxQty:6});
 
 equipmentList.push({name:"Console - Science - Temporally Shielded Datacore",
 mark:defaultMark,
@@ -182,7 +187,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Science_-_Temporally_Shielded_Datacore_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.25});
+stat1value:1.25,
+quantity:1,
+maxQty:1});
 
 equipmentList.push({name:"Console - Tactical - Chronometric Capacitor",
 mark:defaultMark,
@@ -190,7 +197,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Tactical_-_Chronometric_Capacitor_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.MARK_AND_RARITY,
-stat1value:1.875});
+stat1value:1.875,
+quantity:1,
+maxQty:1});
 
 equipmentList.push({name:"Console - Universal - Auxiliary Ejection Assembly",
 mark:defaultMark,
@@ -198,7 +207,9 @@ rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png",
 stat1:stats.Cat2_EXOTIC,
 stat1type:statScaling.FIXED,
-stat1value:0.178});
+stat1value:0.178,
+quantity:1,
+maxQty:1});
 
 equipmentList.push({name:"Console - Universal - Disruption Pulse Emitter",
 mark:defaultMark,
@@ -206,11 +217,12 @@ rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Disruption_Pulse_Emitter_icon.png",
 stat1:stats.EPG,
 stat1type:statScaling.FIXED,
-stat1value:0.20});
+stat1value:0.20,
+quantity:1,
+maxQty:1});
 
 
 function flipColor(cardID) {
-
 	var backString = cardID.style.background;
 	backString = backString.slice(4, backString.indexOf(")"));
 	var seld;
@@ -259,20 +271,20 @@ var rarityNew;
 			alert("There is an error with rarity selection");
 		}
 		equipmentList[x].rarity = rarityNew;
-		mainCard.innerHTML = mainCard.innerHTML.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);
+		mainCard.children[0].children[1].src = mainCard.children[0].children[1].src.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);
 		}
 	}
 	if (backString != "0, 0, 0") {
 		flipColor(mainCard);
 	}
 }
-function upgClick(cardID,event) {
+
+function upgClickSpin(cardID,event) {
 	event.stopPropagation();
 var mainCard = cardID.parentNode.parentNode.parentNode;
-var markUP = (cardID.value == "Upgrade Mk");
 var markCurrent;
-var markNew;
-	var backString = mainCard.style.background;
+var markNew = cardID.value;
+var backString = mainCard.style.background;
 	backString = backString.slice(4, backString.indexOf(")"));
 	if (backString != "0, 0, 0") {
 		flipColor(mainCard);
@@ -280,20 +292,29 @@ var markNew;
 	for (var x = 0; x < equipmentList.length; x++) {
 		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
 			markCurrent = equipmentList[x].mark;
-		if (markUP) {
-			markNew = Math.min(markCurrent + 1, 15);
-			//alert("Power UP");
+			equipmentList[x].mark = Number(markNew);
+			mainCard.children[0].children[2].src = mainCard.children[0].children[2].src.replace(ROMAN[markCurrent], ROMAN[markNew]);
 		}
-		else if (!markUP) {
-			markNew = Math.max(markCurrent - 1, 1);
-			//alert("Power DOWN");
-		}
-		else {
-			alert("There is an error with mark selection");
-		}
-		equipmentList[x].mark = markNew;
-		mainCard.innerHTML = mainCard.innerHTML.replace(ROMAN[markCurrent], ROMAN[markNew]);
-		//console.log(markNew);
+	}
+	if (backString != "0, 0, 0") {
+		flipColor(mainCard);
+	}
+}
+
+function qtyClickSpin(cardID,event) {
+	event.stopPropagation();
+var mainCard = cardID.parentNode.parentNode.parentNode;
+var qtyCurrent;
+var qtyNew = cardID.value;
+var backString = mainCard.style.background;
+	backString = backString.slice(4, backString.indexOf(")"));
+	if (backString != "0, 0, 0") {
+		flipColor(mainCard);
+	}
+	for (var x = 0; x < equipmentList.length; x++) {
+		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
+			qtyCurrent = equipmentList[x].quantity;
+			equipmentList[x].quantity = Number(qtyNew);
 		}
 	}
 	if (backString != "0, 0, 0") {
@@ -304,25 +325,25 @@ var markNew;
 function sumStats(itemNum,seld) {
 			switch(equipmentList[itemNum].stat1type) {
 				case statScaling.MARK_AND_RARITY:
-				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].stat1value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
 				break;
 				case statScaling.MARK_ONLY:
-				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].stat1value * (1 + equipmentList[itemNum].mark);
+				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value * (1 + equipmentList[itemNum].mark);
 				break;
 				case statScaling.FIXED:
-				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].stat1value;
+				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value;
 				break;
 				default:
 				}
 			switch(equipmentList[itemNum].stat2type) {
 				case statScaling.MARK_AND_RARITY:
-				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].stat2value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
 				break;
 				case statScaling.MARK_ONLY:
-				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].stat2value * (1 + equipmentList[itemNum].mark);
+				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value * (1 + equipmentList[itemNum].mark);
 				break;
 				case statScaling.FIXED:
-				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].stat2value;
+				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value;
 				break;
 				default:
 				}
@@ -336,7 +357,19 @@ var len = equipmentList.length;
 //equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
 //}
 
-var baseMessage = '<div class="row"><div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);"><div class="imageWrapper"><img class="overlayImage" src="img/ITEM_ICON" alt="Icon" width="49" height="64"><img class="overlayImage" src="img/RARITY_ICON" alt="Rarity" width="49" height="64"><img class="overlayImage" src="img/MkMARK_ICONicon.png" alt="Mark" width="49" height="64"></div><div class="container"><p id="BLURBID" style="margin-left: 55px">BLURB<br><input type="button" value="Upgrade Mk" onClick="upgClick(this,event)"><input type="button" value="Downgrade Mk" onClick="upgClick(this,event)"><input type="button" value="Upgrade Rarity" onClick="rarClick(this,event)"><input type="button" value="Downgrade Rarity" onClick="rarClick(this,event)"></p></div></div><br></div>';
+var baseMessage = '<div class="row">'+
+'<div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);">'+
+	'<div class="imageWrapper">'+
+		'<img class="overlayImage" src="img/ITEM_ICON" alt="Icon">'+
+		'<img class="overlayImage" src="img/RARITY_ICON" alt="Rarity" id="rarity_icon">'+
+		'<img class="overlayImage" src="img/MkMARK_ICONicon.png" alt="Mark" id="mk_icon">'+
+	'</div><div class="container">'+
+'<p style="margin-left: 57px; padding-top: 5px">BLURB<br>'+
+' Mark: <input type="number" value="15" min="1" max="15" onclick="upgClickSpin(this,event)" onkeyup="upgClickSpin(this,event)" id="number" required>'+
+'<input type="button" value="Upgrade Rarity" onClick="rarClick(this,event)">'+
+'<input type="button" value="Downgrade Rarity" onClick="rarClick(this,event)">'+
+'QTY_NOTE' +
+'</p></div></div></div>';
 var messageData = "";
 for (var x = 0; x < len; x++) {
 messageData += baseMessage;
@@ -351,9 +384,14 @@ else
 messageData = messageData.replace("ITEM_ICON", 'MissingNO_icon.png');
 }
 messageData = messageData.replace("RARITY_ICON", rarityIcons[equipmentList[x].rarity-1]);
-messageData = messageData.replace("BLURBID", "desc" + x);
 messageData = messageData.replace("BLURB", equipmentList[x].name);
 messageData = messageData.replace("MARK_ICON", ROMAN[equipmentList[x].mark]);
+if (equipmentList[x].maxQty != 1) {
+messageData = messageData.replace('QTY_NOTE', '<br>Quantity: <input type="number" value="1" min="1" max="'+ equipmentList[x].maxQty +'" onclick="qtyClickSpin(this,event)" onkeyup="qtyClickSpin(this,event)" id="number" required>');
+}
+else {
+messageData = messageData.replace('QTY_NOTE', '');
+}
 }
 document.getElementById('items').innerHTML = '<div class="column">' + messageData + '</div>';
 //dummy placeholder for the output powers
@@ -362,9 +400,9 @@ updateTotals();
 }
 function updateTotals() {
 var statData;
-statData = "EPG: " + totalStats[0] +
-"<br>Cat1: " + totalStats[1] + 
-"<br>Cat2: " + totalStats[2] + 
+statData = "EPG: " + Math.round(totalStats[0]*1000)/1000 +
+"<br>Cat1: " + Math.round(totalStats[1]*1000)/1000 + 
+"<br>Cat2: " + Math.round(totalStats[2]*1000)/1000 + 
 "<br>";
 document.getElementById('statCollection').innerHTML = statData;
 }
