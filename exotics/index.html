@@ -63,8 +63,13 @@ img {
 
 <h2>Exotic Damage Calculator</h2>
 <p id="statCollection"></p>
+<label for="searchItems">Search: </label>
+<input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
 <p id="items"></p>
 <script>
+var PART_MANIP_IS_ACTIVE_OVERLORD = false;
+var AUX_POWER_CONFIG_IS_ACTIVE = false;
+var T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
 var totalStats=[0,0,0,0,0,0,0,0,0];
 const rarity = {
 COMMON: 1,
@@ -94,6 +99,551 @@ var defaultMark = 15;
 var defaultQty = 1;
 var equipmentList = [ ];
 var maxStats = 2;
+
+equipmentList.push({name:"Starship Exotic Particle Generators Skill",
+mark:1,
+rarity:rarity.COMMON,
+icon:"EPG_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.FIXED,
+stat1value:1,
+quantity:1,
+maxQty:100,
+unique:true});
+
+equipmentList.push({name:"Starship Mastery - Enhanced Particle Generators",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.15,
+quantity:1,
+maxQty:1,
+qtyLabel:"Points",
+unique:true});
+
+equipmentList.push({name:"Starship Support Configuration - Temporal Ships",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.2,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Attack Pattern Delta Prime",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.015,
+stat2:stats.CrtD_EXOTIC,
+stat2type:statScaling.FIXED,
+stat2value:0.0375,
+quantity:10,
+maxQty:10,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Designated Target",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.1,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Checkmate",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.3,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Emitter Synergy",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.075,
+quantity:1,
+maxQty:3,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Exotic Modulation",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.2,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - History Will Remember",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.01,
+quantity:1,
+maxQty:30,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Improved Critical Systems",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.03,
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.15,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Improved Photonic Officer",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.25,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Improved Feedback Pulse",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.01,
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:10,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Insidious Tactics",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.01,
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:3,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Kick Them While They're Down",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:5,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Numerical Superiority",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.3,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Partners in Arms",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.1,
+quantity:1,
+maxQty:3,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Time to Kill",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.1,
+quantity:1,
+maxQty:3,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Superior Pedal to the Metal",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.03,
+quantity:1,
+maxQty:10,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Improved Petal to the Metal",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.02,
+quantity:1,
+maxQty:10,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Petal to the Metal",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.01,
+quantity:1,
+maxQty:10,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Strike from Shadows",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat2value:0.05,
+stat1:stats.Cat2_EXOTIC,
+stat2type:statScaling.FIXED,
+stat2value:0.05,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Terran Machinations",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.3,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Unconventional Tactics",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.15,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Starship Trait - Improved Unconventional Tactics",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.2,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Anchored",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:4,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Conservation of Energy",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.1,
+quantity:1,
+maxQty:4,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Context is for Kings",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.01,
+quantity:1,
+maxQty:10,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Duelist's Fervor",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:3,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Enlightened",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.15,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Fleet Coordinator",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.02,
+quantity:1,
+maxQty:5,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Inspirational Leader",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.EPG,
+stat1type:statScaling.FIXED,
+stat1value:10,
+quantity:1,
+maxQty:3,
+qtyLabel:"Stacks",
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Operative",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.01,
+stat2:stats.CrtD_EXOTIC,
+stat2type:statScaling.FIXED,
+stat2value:0.02,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Particle Manipulator",//This one is special...
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Positive Feedback Loop",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.1,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Romulan Operative",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.015,
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.0375,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Personal Trait - Terran Targeting Systems",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.15,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Advanced Targeting Systems (T5)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.16,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Precision (T5)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.04,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Particle Generator Amplifier (T5)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Counter-Stroke (T5)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.35,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Auxiliary Power Configuration - Offensive (T5)",//This one is special too...
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Advanced Targeting Systems (T6)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.16,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Precision (T6)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtH_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.04,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Particle Generator Amplifier (T6)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat2_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.05,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Counter-Stroke (T6)",
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.CrtD_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0.35,
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Reputation Trait - Auxiliary Power Configuration - Offensive (T6)",//This one is special too...
+mark:1,
+rarity:rarity.COMMON,
+icon:"TBD_icon.png",
+stat1:stats.Cat1_EXOTIC,
+stat1type:statScaling.FIXED,
+stat1value:0,
+quantity:1,
+maxQty:1,
+unique:true});
 
 equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
 mark:defaultMark,
@@ -233,14 +783,30 @@ quantity:1,
 maxQty:1,
 unique:true});
 
+var powerList = [ ];
+
+powerList.push({name:"Gravity Well",
+levels:3,
+icon:"Gravity_Well.png",
+levelScale:true,
+auxScale:true,
+equation:"A",
+base:[0,168.6,224.8,281],
+damageType:"Kinetic"});
+
+powerList.push({name:"Photonic Shockwave",
+levels:3,
+icon:"Shockwave.png",
+levelScale:true,
+auxScale:false,
+equation:"A",
+base:[0,1873.5,2498,3122.4],
+damageType:"Kinetic"});
 
 function flipColor(cardID) {
 	var backString = cardID.style.background;
 	backString = backString.slice(4, backString.indexOf(")"));
 	var seld;
-	//if (cardID.innerHTML == equipmentList[0].name) {
-	//	cardID.style.background = '#22CC22';
-	//}
 	if (backString == "0, 0, 0") {
 		cardID.style.background = '#2222CC';
 		seld = 1;
@@ -249,8 +815,25 @@ function flipColor(cardID) {
 		cardID.style.background = '#000000';
 		seld = -1;
 	}
-	//alert(cardID.innerHTML.indexOf(equipmentList[0].name));
 	for (var x = 0; x < equipmentList.length; x++) {
+		if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == 1) {
+		PART_MANIP_IS_ACTIVE_OVERLORD = true;
+		}
+		else if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == -1) {
+		PART_MANIP_IS_ACTIVE_OVERLORD = false;
+		}
+		else if(cardID.innerHTML.indexOf("Power Configuration - Offensive (T5)")> -1 && seld == 1) {
+		AUX_POWER_CONFIG_IS_ACTIVE = true;
+		}
+		else if(cardID.innerHTML.indexOf("Power Configuration - Offensive (T5)")> -1 && seld == -1) {
+		AUX_POWER_CONFIG_IS_ACTIVE = false;
+		}
+		else if(cardID.innerHTML.indexOf("Power Configuration - Offensive (T6)")> -1 && seld == 1) {
+		T6_AUX_POWER_CONFIG_IS_ACTIVE = true;
+		}
+		else if(cardID.innerHTML.indexOf("Power Configuration - Offensive (T6)")> -1 && seld == -1) {
+		T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
+		}
 		if(cardID.innerHTML.indexOf(equipmentList[x].name) > -1) {
 			sumStats(x,seld);
 		}
@@ -335,41 +918,55 @@ var backString = mainCard.style.background;
 }
 
 function sumStats(itemNum,seld) {
-			switch(equipmentList[itemNum].stat1type) {
-				case statScaling.MARK_AND_RARITY:
-				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
-				break;
-				case statScaling.MARK_ONLY:
-				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value * (1 + equipmentList[itemNum].mark);
-				break;
-				case statScaling.FIXED:
-				totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value;
-				break;
-				default:
-				}
-			switch(equipmentList[itemNum].stat2type) {
-				case statScaling.MARK_AND_RARITY:
-				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
-				break;
-				case statScaling.MARK_ONLY:
-				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value * (1 + equipmentList[itemNum].mark);
-				break;
-				case statScaling.FIXED:
-				totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value;
-				break;
-				default:
-				}
+	switch(equipmentList[itemNum].stat1type) {
+		case statScaling.MARK_AND_RARITY:
+		totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+		break;
+		case statScaling.MARK_ONLY:
+		totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value * (1 + equipmentList[itemNum].mark);
+		break;
+		case statScaling.FIXED:
+		totalStats[equipmentList[itemNum].stat1] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat1value;
+		break;
+		default:
+		}
+	switch(equipmentList[itemNum].stat2type) {
+		case statScaling.MARK_AND_RARITY:
+		totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+		break;
+		case statScaling.MARK_ONLY:
+		totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value * (1 + equipmentList[itemNum].mark);
+		break;
+		case statScaling.FIXED:
+		totalStats[equipmentList[itemNum].stat2] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].stat2value;
+		break;
+		default:
+		}
+}
+
+function searchItemsFn() {
+var searchText = document.getElementById("searchItems").value;
+var cardELEMENT = document.getElementsByClassName('card');
+for (var x = 0; x < cardELEMENT.length; x++) {
+	if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {
+		cardELEMENT[x].hidden = false;
+	}
+	else {
+		cardELEMENT[x].hidden = true;
+	}
+}
+
 }
 
 function listEntries() {
 
-var len = equipmentList.length;
+var lenEq = equipmentList.length;
 //This is just temporary to to limited testing before selection
 //for (var bloop = 1; bloop < len; bloop++) {
 //equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
 //}
 
-var baseMessage = '<div class="row">'+
+var baseMessageItem = '<div class="row">'+
 '<div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);">'+
 	'<div class="imageWrapper">'+
 		'<img class="overlayImage" src="img/ITEM_ICON" alt="Icon">'+
@@ -381,52 +978,117 @@ var baseMessage = '<div class="row">'+
 		'QTY_NOTE' +
 '</p></div></div></div>';
 var messageData = "";
-for (var x = 0; x < len; x++) {
-messageData += baseMessage;
+for (var x = 0; x < lenEq; x++) {
+	messageData += baseMessageItem;
 
+	//Input the actual string and display card
+	if (equipmentList[x].icon != undefined) {
+	messageData = messageData.replace("ITEM_ICON", equipmentList[x].icon);
+	}
+	else
+	{
+	messageData = messageData.replace("ITEM_ICON", 'MissingNO_icon.png');
+	}
+	if (equipmentList[x].unique) {
+	messageData = messageData.replace('SCALING_NOTE', '');
+	messageData = messageData.replace('MK_INSTANCE', '');
+	}
+	else {
+	messageData = messageData.replace('SCALING_NOTE', ' Mark: <input type="number" value="15" min="1" max="15" onclick="upgClickSpin(this,event)" onkeyup="upgClickSpin(this,event)" id="number" required>'+
+			'<input type="button" value="Upgrade Rarity" onClick="rarClick(this,event)">'+
+			'<input type="button" value="Downgrade Rarity" onClick="rarClick(this,event)">');
+	messageData = messageData.replace('MK_INSTANCE', '<img class="overlayImage" src="img/MkMARK_ICONicon.png" alt="Mark" id="mk_icon">');
+	}
 
-//Input the actual string and display card
-if (equipmentList[x].icon != undefined) {
-messageData = messageData.replace("ITEM_ICON", equipmentList[x].icon);
-}
-else
-{
-messageData = messageData.replace("ITEM_ICON", 'MissingNO_icon.png');
-}
-if (equipmentList[x].unique) {
-messageData = messageData.replace('SCALING_NOTE', '');
-messageData = messageData.replace('MK_INSTANCE', '');
-}
-else {
-messageData = messageData.replace('SCALING_NOTE', ' Mark: <input type="number" value="15" min="1" max="15" onclick="upgClickSpin(this,event)" onkeyup="upgClickSpin(this,event)" id="number" required>'+
-		'<input type="button" value="Upgrade Rarity" onClick="rarClick(this,event)">'+
-		'<input type="button" value="Downgrade Rarity" onClick="rarClick(this,event)">');
-messageData = messageData.replace('MK_INSTANCE', '<img class="overlayImage" src="img/MkMARK_ICONicon.png" alt="Mark" id="mk_icon">');
-}
-
-messageData = messageData.replace("RARITY_ICON", rarityIcons[equipmentList[x].rarity-1]);
-messageData = messageData.replace("BLURB", equipmentList[x].name);
-messageData = messageData.replace("MARK_ICON", ROMAN[equipmentList[x].mark]);
-if (equipmentList[x].maxQty != 1) {
-messageData = messageData.replace('QTY_NOTE', '<br>Quantity: <input type="number" value="1" min="1" max="'+ equipmentList[x].maxQty +'" onclick="qtyClickSpin(this,event)" onkeyup="qtyClickSpin(this,event)" id="number" required>');
-}
-else {
-messageData = messageData.replace('QTY_NOTE', '');
-}
+	messageData = messageData.replace("RARITY_ICON", rarityIcons[equipmentList[x].rarity-1]);
+	messageData = messageData.replace("BLURB", equipmentList[x].name);
+	messageData = messageData.replace("MARK_ICON", ROMAN[equipmentList[x].mark]);
+	var qtyNote;
+	if (equipmentList[x].qtyLabel != undefined) {
+		qtyNote = equipmentList[x].qtyLabel;
+	}
+	else {
+		qtyNote = "Quantity: "
+	}
+	
+	if (equipmentList[x].maxQty != 1) {
+	messageData = messageData.replace('QTY_NOTE', '<br>'+ qtyNote +': <input type="number" value="1" min="1" max="'+ equipmentList[x].maxQty +'" onclick="qtyClickSpin(this,event)" onkeyup="qtyClickSpin(this,event)" id="number" required>');
+	}
+	else {
+	messageData = messageData.replace('QTY_NOTE', '');
+	}
 
 }
 document.getElementById('items').innerHTML = '<div class="column">' + messageData + '</div>';
-//dummy placeholder for the output powers
-document.getElementById('items').innerHTML += '<div class="column">' + 'Output Data<br>The results for powers will show up here' + '</div>';
+
+//Output powers
+var baseMessagePower = '<div class="row">'+
+'<div class="card" style="background: rgb(0, 0, 0);">'+
+	'<div class="imageWrapper">'+
+		'<img class="overlayImage" src="img/POWER_ICON" alt="Icon">'+
+	'</div><div class="container">'+
+		'<p style="margin-left: 57px; padding-top: 5px">BLURB_POWER<br>'+
+		'<p style="margin-left: 57px;" id="powerSummaryX"></p>'+
+'</p></div></div></div>';
+var messageDataX = "";
+var lenPw = powerList.length;
+for (var x = 0; x < lenPw; x++) {
+	messageDataX += baseMessagePower;
+	if (equipmentList[x].icon != undefined) {
+		messageDataX = messageDataX.replace("POWER_ICON", powerList[x].icon);
+	}
+	else {
+		messageDataX = messageDataX.replace("POWER_ICON", 'MissingNO_icon.png');
+	}
+	messageDataX = messageDataX.replace("powerSummaryX","powerSummary"+x);
+	messageDataX = messageDataX.replace("BLURB_POWER",powerList[x].name);
+}
+document.getElementById('items').innerHTML += '<div class="column">' + messageDataX + '</div>';
 updateTotals();
 }
 function updateTotals() {
 var statData;
-statData = "EPG: " + Math.round(totalStats[0]*1000)/1000 +
-"<br>Cat1: " + Math.round(totalStats[1]*1000)/1000 + 
-"<br>Cat2: " + Math.round(totalStats[2]*1000)/1000 + 
-"<br>";
+totalStats[5] = 100; //Setting Aux Because there's nothing that sets it otherwise yet
+//totalStats[stats.Cat1_EXOTIC] = 0.04;
+//Particle Manip handling
+var PM_CrtH = Math.min(totalStats[stats.EPG]*0.002,0.5)*PART_MANIP_IS_ACTIVE_OVERLORD;
+var PM_CrtD = totalStats[stats.EPG]*0.001*PART_MANIP_IS_ACTIVE_OVERLORD;
+//Aux Power Config handling
+var APC_Cat2 = totalStats[stats.AUX_POWER]*0.0005*AUX_POWER_CONFIG_IS_ACTIVE + 
+totalStats[stats.AUX_POWER]*0.0005*T6_AUX_POWER_CONFIG_IS_ACTIVE*1.25;
+statData = "EPG: " + Math.round(totalStats[stats.EPG]*1000)/1000 +
+"<br>Cat1: " + Math.round(totalStats[stats.Cat1_EXOTIC]*1000)/1000 + 
+"<br>Cat2: " + Math.round((totalStats[stats.Cat2_EXOTIC]+APC_Cat2)*1000)/1000 + 
+"<br>Exotic CrtH: " + Math.round((totalStats[stats.CrtH_EXOTIC]+PM_CrtH)*1000)/1000 + 
+"<br>Exotic CrtD: " + Math.round((totalStats[stats.CrtD_EXOTIC]+PM_CrtD)*1000)/1000 + 
+"<br>Aux Power: " + Math.round(totalStats[stats.AUX_POWER]*1000)/1000 + 
+"<br>Max Aux Power: " + Math.round(totalStats[stats.MAX_AUX_POWER]*1000)/1000;
 document.getElementById('statCollection').innerHTML = statData;
+var powerText = [null];
+for (var x = 0; x < powerList.length; x++) {
+	document.getElementById('powerSummary'+x).innerHTML = '';
+	for (var tier = 1; tier <= powerList[x].levels; tier++) {
+		var baseCat1 = 1;
+		if (powerList[x].levelScale) {
+			baseCat1 += 1.75;
+		}
+		switch(powerList[x].equation) {
+		case "A":
+			powerText[tier] = powerList[x].base[tier] * (baseCat1+totalStats[1]+totalStats[0]*0.005) * (1+totalStats[2])
+			break;
+		default:
+			console.log("There is an equiation that is set up poorly for " + powerList[x].name);
+			break;
+		}
+		if(powerList[x].auxScale) {
+			powerText[tier] *= (0.005 * totalStats[5] + 0.5);
+		}
+		powerText[tier] = Math.round(powerText[tier]*10)/10;
+		document.getElementById('powerSummary'+x).innerHTML += "Rank " + tier + ": " + powerText[tier] + ' | ';
+	}
+	var tempString = document.getElementById('powerSummary'+x).innerHTML;
+	document.getElementById('powerSummary'+x).innerHTML = tempString.slice(0,tempString.length-3);
+}
 }
 </script>
 
