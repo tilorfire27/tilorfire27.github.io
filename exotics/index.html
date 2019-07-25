@@ -2,6 +2,10 @@
 <html>
 <head>
 <style>
+body {
+    background-color: #AAAAAA;
+}
+
 .imageWrapper {
   position: relative;
 }
@@ -34,7 +38,7 @@ img {
 	width: 49px;
 	height: 64px;	
 }
-/* Create three equal columns that floats next to each other */
+/* Create two equal columns that floats next to each other */
 .column {
   float: left;
   width: 45%;
@@ -67,12 +71,13 @@ img {
 <abbr title='Category 2 Damage, typically equivalent to "Bonus Exotic Damage"'>Cat2</abbr>: <span id="Cat2">0</span><br>
 Exotic <abbr title='Critical Hit Chance'>CrtH</abbr>: <span id="CrtH">0</span><br>
 Exotic <abbr title='Critical Hit Severity'>CrtD</abbr>: <span id="CrtD">0</span><br>
-Auxiliary Power: <span id="AUX">0</span><br>
-Maximum Auxiliary Power: <span id="AUXMAX">0</span></p>
+Auxiliary Power: <span id="AUX"><input id="AUX_NUM" type="number" value="100" min="0" max="200" style="width:3em" onclick="setAux(this,event)" onkeyup="setAux(this,event)"></span><br>
+
 <label for="searchItems">Search: </label>
 <input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
 <p id="items"></p>
 <script>
+
 var PART_MANIP_IS_ACTIVE_OVERLORD = false;
 var AUX_POWER_CONFIG_IS_ACTIVE = false;
 var T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
@@ -97,6 +102,14 @@ CrtH_EXOTIC: 4,//"Critical Hit Chance - Exotic",
 AUX_POWER: 5,//"Auxiliary Power",
 MAX_AUX_POWER: 6,//"Auxiliary Power Capacity Increase"
 };
+var statsFriendly = ["EPG",//"Exotic Particle Generator",
+"Cat1",//"Cat1 Exotic Damage",
+"Cat2",//"Cat2 Exotic Damage",
+"CrtD",//"Critical Damage - Exotic",
+"CrtH",//"Critical Hit Chance - Exotic",
+"Aux Power",//"Auxiliary Power",
+"Max Aux Power"]//"Auxiliary Power Capacity Increase"
+//Maximum Auxiliary Power: <span id="AUXMAX">0</span></p>  Put this back if we want to track max
 const statScaling = {
 FIXED: "Fixed",
 MARK_ONLY: "Mark Only",
@@ -115,6 +128,7 @@ icon:"Science_Skill_4_R1.png",
 statItem:[stats.EPG],
 statType:[statScaling.FIXED],
 statValue:[1],
+statContribution:[0],
 quantity:1,
 maxQty:100,
 qtyLabel:"EPG",
@@ -127,6 +141,7 @@ icon:"TBD_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.FIXED],
 statValue:[50],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -138,6 +153,7 @@ icon:"37px-Mastery_passive_enhanced_particle_generators_tac_fed.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 qtyLabel:"Points",
@@ -150,6 +166,7 @@ icon:"Support_Configuration_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.2],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -161,6 +178,7 @@ icon:"Attack_Pattern_Delta_Prime_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.015,0.0375],
+statContribution:[0,0],
 quantity:10,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -173,6 +191,7 @@ icon:"Mastery_trait_designated_target.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -184,6 +203,7 @@ icon:"Check_Mate_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.3],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -195,6 +215,7 @@ icon:"Emitter_Synergy_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.075],
+statContribution:[0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Stacks",
@@ -207,6 +228,7 @@ icon:"Exotic_Modulation_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.2],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -218,6 +240,7 @@ icon:"History_Will_Remember_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.01],
+statContribution:[0],
 quantity:1,
 maxQty:30,
 qtyLabel:"Stacks",
@@ -230,6 +253,7 @@ icon:"Improved_Critical_Systems_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.03,0.15],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -241,6 +265,7 @@ icon:"Improved_Photonic_Officer_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.25],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -252,6 +277,7 @@ icon:"Mastery_trait_improved_feedback_pulse.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.01,0.05],
+statContribution:[0,0],
 quantity:1,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -264,6 +290,7 @@ icon:"Insidious_Tactics_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.01,0.05],
+statContribution:[0,0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Stacks",
@@ -276,6 +303,7 @@ icon:"Kick_Them_While_Theyre_Down_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:5,
 qtyLabel:"Stacks",
@@ -288,6 +316,7 @@ icon:"Numerical_Superiority_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.3],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -299,6 +328,7 @@ icon:"Partners_In_Arms_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Stacks",
@@ -311,6 +341,7 @@ icon:"Time_to_Kill_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Stacks",
@@ -323,6 +354,7 @@ icon:"Pedal_to_the_Metal_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.03],
+statContribution:[0],
 quantity:1,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -335,6 +367,7 @@ icon:"Pedal_to_the_Metal_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.02],
+statContribution:[0],
 quantity:1,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -347,6 +380,7 @@ icon:"Pedal_to_the_Metal_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.01],
+statContribution:[0],
 quantity:1,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -359,6 +393,7 @@ icon:"Strike_from_Shadows_icon.png",
 statItem:[stats.CrtD_EXOTIC,stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.05,0.05],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -370,6 +405,7 @@ icon:"Terran_Machinations_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.3],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -381,6 +417,7 @@ icon:"Unconventional_Tactics_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -392,6 +429,7 @@ icon:"Unconventional_Tactics_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.2],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -403,6 +441,7 @@ icon:"Anchored_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:4,
 qtyLabel:"Stacks",
@@ -415,6 +454,7 @@ icon:"Conservation_of_Energy_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:4,
 qtyLabel:"Stacks",
@@ -427,6 +467,7 @@ icon:"Context_is_for_Kings_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.01],
+statContribution:[0],
 quantity:1,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -439,6 +480,7 @@ icon:"Duelists_Fervor_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Stacks",
@@ -451,6 +493,7 @@ icon:"Enlightened_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -462,6 +505,7 @@ icon:"Fleet_Coordinator_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.02],
+statContribution:[0],
 quantity:1,
 maxQty:5,
 qtyLabel:"Stacks",
@@ -474,6 +518,7 @@ icon:"Inspirational_Leader_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.FIXED],
 statValue:[10],
+statContribution:[0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Stacks",
@@ -486,6 +531,7 @@ icon:"Operative_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.01,0.02],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -494,9 +540,10 @@ equipmentList.push({name:"Personal Trait - Particle Manipulator",//This one is s
 mark:1,
 rarity:rarity.COMMON,
 icon:"Particle_Manipulator_icon.png",
-statItem:[stats.Cat1_EXOTIC],
-statType:[statScaling.FIXED],
-statValue:[0],
+statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
+statType:[statScaling.FIXED,statScaling.FIXED],
+statValue:[0,0],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -508,6 +555,7 @@ icon:"Positive_Feedback_Loop_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -519,6 +567,7 @@ icon:"Romulan_Operative_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.015,0.0375],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -530,6 +579,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -541,6 +591,7 @@ icon:"Advanced_Targeting_Systems_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.16],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -552,6 +603,7 @@ icon:"Precision_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.04],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -563,6 +615,7 @@ icon:"Particle_Generator_Amplifier_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -574,6 +627,7 @@ icon:"Counter-Stroke_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.35],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -585,6 +639,7 @@ icon:"Auxiliary_Power_Configuration_-_Offense_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -596,6 +651,7 @@ icon:"Advanced_Targeting_Systems_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.16],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -607,6 +663,7 @@ icon:"Precision_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.04],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -618,6 +675,7 @@ icon:"Particle_Generator_Amplifier_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -629,6 +687,7 @@ icon:"Counter-Stroke_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.35],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -640,6 +699,7 @@ icon:"Auxiliary_Power_Configuration_-_Offense_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -651,6 +711,7 @@ icon:"Attack_Pattern_Alpha_icon_Klingon.png",
 statItem:[stats.Cat2_EXOTIC,stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED,statScaling.FIXED],
 statValue:[0.496,0.0496,0.496],
+statContribution:[0,0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -662,6 +723,7 @@ icon:"Voth_Cloak_icon_Romulan.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -673,6 +735,7 @@ icon:"Subterfuge_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.25],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -684,6 +747,7 @@ icon:"Subterfuge_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.3],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -695,6 +759,7 @@ icon:"Focused_Frenzy_icon_Federation.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.08],
+statContribution:[0],
 quantity:1,
 maxQty:5,
 qtyLabel:"Stacks",
@@ -707,18 +772,32 @@ icon:"Go_Down_Fighting_icon_Federation.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.01],
+statContribution:[0],
 quantity:1,
 maxQty:100,
 qtyLabel:"Health Lost %",
 unique:true});
 
-equipmentList.push({name:"Quantum Singularity Manipulation",
+equipmentList.push({name:"Quantum Singularity Manipulation T5",
 mark:1,
 rarity:rarity.COMMON,
 icon:"Quantum_Singularity_Manipulation_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.FIXED],
 statValue:[100],
+statContribution:[0],
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Quantum Singularity Manipulation T6",
+mark:1,
+rarity:rarity.COMMON,
+icon:"Quantum_Singularity_Manipulation_icon.png",
+statItem:[stats.EPG],
+statType:[statScaling.FIXED],
+statValue:[125],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -730,6 +809,7 @@ icon:"Scattering_Field_icon_Federation.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.236],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -741,6 +821,7 @@ icon:"Tactical_Fleet_icon_Federation.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.374],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -752,6 +833,7 @@ icon:"Attack_Pattern_Omega_icon_Federation.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -763,6 +845,7 @@ icon:"Attack_Pattern_Omega_icon_Federation.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.249],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -774,6 +857,7 @@ icon:"Emergency_Power_to_Auxiliary_icon_Klingon.png",
 statItem:[stats.EPG,stats.AUX_POWER],
 statType:[statScaling.MARK_ONLY,statScaling.MARK_ONLY],
 statValue:[5,10],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 markLabel:"Rank: ",
@@ -786,6 +870,7 @@ icon:"Fly_Her_Apart_icon_Federation.png",
 statItem:[stats.Cat2_EXOTIC,stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED,statScaling.MARK_ONLY],
 statValue:[0.01,0.005],
+statContribution:[0],
 quantity:1,
 maxQty:15,
 markLabel:"Rank: ",
@@ -799,6 +884,7 @@ icon:"Focused_Assault_icon_Klingon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.MARK_ONLY],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 markLabel:"Rank: ",
@@ -812,6 +898,7 @@ icon:"Matter_Anti-Matter_Warp_Core_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.033],
+statContribution:[0],
 quantity:1,
 maxQty:4,
 qtyLabel:"AMP Stacks",
@@ -824,6 +911,7 @@ icon:"Romulan_Operative_icon.png",
 statItem:[stats.CrtD_EXOTIC,stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.05,0.01],
+statContribution:[0,0],
 quantity:1,
 maxQty:6,
 qtyLabel:"Officers",
@@ -836,6 +924,7 @@ icon:"Chronometric_Energy_Converter_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.002],
+statContribution:[0],
 quantity:75,
 maxQty:200,
 qtyLabel:"Weapon Power",
@@ -848,6 +937,7 @@ icon:"Chronometric_Energy_Converter_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.076],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -859,6 +949,7 @@ icon:"Elite_Fleet_Intervention_Protomatter_Deflector_Array_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.0004],
+statContribution:[0],
 quantity:100,
 maxQty:100,
 qtyLabel:"Hull %",
@@ -871,6 +962,19 @@ icon:"Console_-_Universal_-_Interphase_Quantum_Distributor_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
+quantity:1,
+maxQty:1,
+unique:true});
+
+equipmentList.push({name:"Tholian Technologies - 2pc Set Bonus",
+mark:1,
+rarity:rarity.EPIC,
+icon:"TBD_icon.png",
+statItem:[stats.Cat1_EXOTIC],
+statType:[statScaling.FIXED],
+statValue:[0.1],
+statContribution:[0.1],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -882,6 +986,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.02],
+statContribution:[0],
 quantity:1,
 maxQty:15,
 qtyLabel:"Points",
@@ -894,6 +999,7 @@ icon:"Battery_-_Exotic_Particle_Flood_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.2],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -905,6 +1011,7 @@ icon:"Console_-_Universal_-_Flagship_Tactical_Computer_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.02],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -916,6 +1023,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 markLabel:"Tier",
@@ -928,6 +1036,7 @@ icon:"Pirate_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.015],
+statContribution:[0],
 quantity:1,
 maxQty:6,
 qtyLabel:"Officers",
@@ -940,6 +1049,7 @@ icon:"Romulan_Operative_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.015,.0375],
+statContribution:[0,0],
 quantity:1,
 maxQty:6,
 qtyLabel:"Officers",
@@ -952,6 +1062,7 @@ icon:"Romulan_Operative_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.02,0.05],
+statContribution:[0,0],
 quantity:1,
 maxQty:6,
 qtyLabel:"Officers",
@@ -964,6 +1075,7 @@ icon:"Prevailing_Innervated_Resilient_Shield_Array_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.01,0.1],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -975,6 +1087,7 @@ icon:"Console_-_Universal_-_Proton_Particle_Stabilizer_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.03],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -986,6 +1099,7 @@ icon:"Console_-_Universal_-_Proton_Particle_Stabilizer_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -996,7 +1110,8 @@ rarity:rarity.COMMON,
 icon:"Radiant_Subatomic_Pulse_icon_Federation.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
-statValue:[1/3],
+statValue:[0.333],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1008,6 +1123,7 @@ icon:"Bulkhead_Technician_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.25],
+statContribution:[0],
 quantity:1,
 maxQty:3,
 qtyLabel:"Officers",
@@ -1020,6 +1136,7 @@ icon:"Console_-_Tactical_-_Lorcas_Custom_Fire_Controls_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.01],
+statContribution:[0],
 quantity:1,
 maxQty:25,
 qtyLabel:"Stacks",
@@ -1032,6 +1149,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.3],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1043,116 +1161,127 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.45],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Engineering_-_Conductive_RCS_Accelerator_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.875],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [EPG]",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[3.75],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [not-EPG]",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.875],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Particle Generator",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Particle_Generator_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.875],
+statContribution:[0],
 quantity:1,
 maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Shield Refrequencer [EPG]",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Shield_Refrequencer_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.25],
+statContribution:[0],
 quantity:1,
 maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Threat Scaling Console",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Plasma-Generating_Weapon_Signature_Amplifier_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.875],
+statContribution:[0],
 quantity:1,
 maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Primary]",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Focuser_icon.png",
 statItem:[stats.EPG,stats.Cat1_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY,statScaling.FIXED],
 statValue:[1.875,0.075],
+statContribution:[0,0],
 quantity:1,
 maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Secondary]",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Focuser_icon.png",
 statItem:[stats.EPG,stats.Cat1_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY,statScaling.FIXED],
 statValue:[1.25,0.075],
+statContribution:[0,0],
 quantity:1,
 maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Temporally Shielded Datacore",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Temporally_Shielded_Datacore_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.25],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Tactical - Chronometric Capacitor",
 mark:defaultMark,
-rarity:rarity.EPIC,
+rarity:rarity.VERY_RARE,
 icon:"Console_-_Tactical_-_Chronometric_Capacitor_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[1.875],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1164,6 +1293,7 @@ icon:"Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.178],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1175,6 +1305,7 @@ icon:"Console_-_Universal_-_Disruption_Pulse_Emitter_icon.png",
 statItem:[stats.EPG],
 statType:[statScaling.FIXED],
 statValue:[20],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1186,6 +1317,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC,stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.15,0.02],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1197,6 +1329,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[23.7],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1208,6 +1341,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED,statScaling.FIXED],
 statValue:[0.2,0.05],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1219,6 +1353,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.25],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1230,6 +1365,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.4],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1241,6 +1377,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 qtyLabel:"Stacks",
@@ -1253,6 +1390,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.08],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1264,6 +1402,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1275,6 +1414,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.131],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1286,6 +1426,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.262],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1297,6 +1438,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:10,
 qtyLabel:"Stacks",
@@ -1309,6 +1451,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.01],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1320,6 +1463,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1331,6 +1475,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.15],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1342,6 +1487,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.05],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1353,6 +1499,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.075],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1364,6 +1511,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.075],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1375,6 +1523,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.075],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1386,6 +1535,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.06],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1397,6 +1547,7 @@ icon:"TBD_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.FIXED],
 statValue:[0.1],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:true});
@@ -1408,6 +1559,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY,statScaling.MARK_AND_RARITY],
 statValue:[0.0005757,0.005757],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1419,6 +1571,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.00075],
+statContribution:[0],
 quantity:1,
 maxQty:12,
 unique:false});
@@ -1428,8 +1581,9 @@ mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.EPG],
-statType:[statScaling.MARK_AND_RARITY],
+statType:[statScaling.MARK_AND_RARITY,statScaling.MARK_AND_RARITY],
 statValue:[0.00075,1.25],
+statContribution:[0,0],
 quantity:1,
 maxQty:6,
 unique:false});
@@ -1441,6 +1595,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.0125],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1452,6 +1607,7 @@ icon:"Console_-_Universal_-_Interphase_Quantum_Distributor_icon.png",
 statItem:[stats.Cat2_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.0094],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1463,6 +1619,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.001875],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1474,6 +1631,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY,statScaling.MARK_AND_RARITY],
 statValue:[0.000625,0.00625],
+statContribution:[0,0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1485,6 +1643,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtD_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.004707],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1496,6 +1655,7 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.00095],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
@@ -1507,37 +1667,240 @@ icon:"TBD_icon.png",
 statItem:[stats.CrtH_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.001125],
+statContribution:[0],
 quantity:1,
 maxQty:1,
 unique:false});
 
-//POWERS
+equipmentList.push({name:"Console - Universal - Interphasic Instability",
+mark:defaultMark,
+rarity:rarity.EPIC,
+icon:"TBD_icon.png",
+statItem:[stats.Cat1_EXOTIC],
+statType:[statScaling.FIXED],
+statValue:[0.05],
+statContribution:[0.05],
+quantity:1,
+maxQty:1,
+unique:true});
+
+//POWERS---------------------------------------------------------------------------------------------
 var powerList = [ ];
 
-powerList.push({name:"Gravity Well",
-levels:3,
-icon:"Gravity_Well_icon_Federation.png",
-levelScale:true,
+powerList.push({name:"Anti-Time Entanglement Singularity",
+levels:1,
+icon:"Epic_icon.png",
 auxScale:true,
 equation:"A",
-base:[0,168.6,224.8,281],
-damageType:"Kinetic"});
+base:[0,498.326],
+baseCat1:1.882,
+damageType:"Physical"});
 
-powerList.push({name:"Photonic Shockwave",
+powerList.push({name:"Delphic Tear",
+levels:1,
+icon:"Epic_icon.png",
+auxScale:true,
+equation:"A",
+base:[0,142.57],
+baseCat1:1.86,
+damageType:"Radiation"});
+
+powerList.push({name:"Tholian Web Cannon - Inital Blast",
+levels:1,
+icon:"Epic_icon.png",
+auxScale:true,
+equation:"TWC",
+base:[0,881.650],
+baseCat1:1.86,
+damageType:"Physical"});
+
+powerList.push({name:"Tholian Web Cannon - DoT",
+levels:1,
+icon:"Epic_icon.png",
+auxScale:true,
+equation:"TWC",
+base:[0,470.450],
+baseCat1:1.86,
+damageType:"Physical"});
+
+powerList.push({name:"Drain Infection",
+levels:1,
+icon:"Common_icon.png",
+auxScale:true,
+equation:"A",
+base:[0,109.974],
+baseCat1:1.9225,
+damageType:"Electrical"});
+
+powerList.push({name:"Engineering - Aceton Beam",
 levels:3,
-icon:"Photonic_Shockwave_icon_Federation.png",
-levelScale:true,
+icon:"TBD_icon.png",
 auxScale:false,
 equation:"A",
-base:[0,1873.5,2498,3122.4],
+base:[0,200,300,400],
+baseCat1:1.8615,
+damageType:"Radiation"});
+
+powerList.push({name:"Science - Destabilizing Resonance Beam",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"B",
+base:[0,120,150,180],
+baseCat1:1.8690,
+damageType:"Radiation"});
+
+powerList.push({name:"Engineering - Eject Warp Plasma",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,135,180,225],
+baseCat1:1.9219,
+damageType:"Plasma"});
+
+powerList.push({name:"Temporal - Chronometric Inversion Field",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,139.3,181.1,222.9],
+baseCat1:1.8874,
+damageType:"Physical"});
+
+powerList.push({name:"Temporal - Channeled Deconstruction",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,89.613,116.467,143.322],
+baseCat1:1.8830,
+damageType:"Physical"});
+
+powerList.push({name:"Temporal - Entropic Cascade (Primary)",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,200,260,320],
+baseCat1:1.8615,
+damageType:"Physical"});
+
+powerList.push({name:"Temporal - Entropic Redistribution (Primary)",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,1003,1304,1605],
+baseCat1:1.8622,
+damageType:"Physical"});
+
+powerList.push({name:"Temporal - Rapid Decay",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,250,350,450],
+baseCat1:1.8707,
+damageType:"Physical"});
+
+powerList.push({name:"Temporal - Timeline Collapse",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"TC",
+base:[0,1461.187,1607.542,1753.896],
+baseCat1:1.8786,
+damageType:"Physical"});
+
+powerList.push({name:"Engineering - Endothermic Inhibitor Beam",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,120,156,192],
+baseCat1:1.8617,
+damageType:"Radiation"});
+
+powerList.push({name:"Engineering - Structural Integrity Collapse",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,120,156,192],
+baseCat1:1.8617,
+damageType:"Physical"});
+
+powerList.push({name:"Science - Gravity Well",
+levels:3,
+icon:"Gravity_Well_icon_Federation.png",
+auxScale:true,
+equation:"A",
+base:[0,161.306,215.105,268.905],
+baseCat1:1.8849,
 damageType:"Kinetic"});
 
+powerList.push({name:"Science - Subspace Vortex",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:true,
+equation:"A",
+base:[0,189,252,315],
+baseCat1:0,
+damageType:"Kinetic"});
+
+powerList.push({name:"Science - Photonic Shockwave",
+levels:3,
+icon:"Photonic_Shockwave_icon_Federation.png",
+auxScale:false,
+equation:"A",
+base:[0,1800,2400,3000],
+baseCat1:1.8616,
+damageType:"Kinetic"});
+
+powerList.push({name:"Science - Tractor Beam",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"B",//B scales with EPG separately from Cat1
+base:[0,30,40,50],
+baseCat1:0,
+damageType:"Kinetic"});
+
+powerList.push({name:"Science - Tractor Beam Repulsors",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,250,332.5,415],
+baseCat1:1.8620,
+damageType:"Kinetic"});
+
+powerList.push({name:"Science - Feedback Pulse",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,0.1,0.15,0.2],
+baseCat1:0,
+damageType:"Exotic"});
+
+powerList.push({name:"Science - Tyken's Rift",
+levels:3,
+icon:"TBD_icon.png",
+auxScale:false,
+equation:"A",
+base:[0,215.000,286.625,358.250],
+baseCat1:1.8863,
+damageType:"Kinetic"});
+
+//MATHS----------------------------------------------------------------------------------------------
 function flipColor(cardID) {
 	var backString = cardID.style.background;
 	backString = backString.slice(4, backString.indexOf(")"));
 	var seld;
 	if (backString == "0, 0, 0") {
-		cardID.style.background = '#2222CC';
+		cardID.style.background = '#222288';
 		seld = 1;
 	}
 	else {
@@ -1610,6 +1973,11 @@ var rarityNew;
 		flipColor(mainCard);
 	}
 }
+function setAux(cardID,event) {
+//console.log(cardID.value);
+totalStats[stats.AUX_POWER] = cardID.value;
+updateTotals();
+}
 
 function upgClickSpin(cardID,event) {
 	event.stopPropagation();
@@ -1656,42 +2024,51 @@ var backString = mainCard.style.background;
 
 function sumStats(itemNum,seld) {
 	for (var x = 0; x < 3; x++) {
-		switch(equipmentList[itemNum].statType[x]) {
-			case statScaling.MARK_AND_RARITY:
-			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
-			break;
-			case statScaling.MARK_ONLY:
-			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (1 + equipmentList[itemNum].mark);
-			break;
-			case statScaling.FIXED:
-			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x];
-			break;
-			default:
+		if (equipmentList[itemNum].statValue[x] != undefined) {
+			equipmentList[itemNum].statContribution[x] = 0;
+			switch(equipmentList[itemNum].statType[x]) {
+				case statScaling.MARK_AND_RARITY:
+				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+				break;
+				case statScaling.MARK_ONLY:
+				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (1 + equipmentList[itemNum].mark);
+				break;
+				case statScaling.FIXED:
+				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x];
+				break;
+				default:
+				console.log("There's a problem summing stats for " + equipmentList[itemNum].name + " " +x);
+			}
+			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].statContribution[x];
+			equipmentList[itemNum].statContribution[x] = Math.round(equipmentList[itemNum].statContribution[x]*100)/100
+			if (x == 0) {
+				document.getElementById("contrib" + itemNum).innerHTML = '+' + equipmentList[itemNum].statContribution[x] + ' ' + statsFriendly[equipmentList[itemNum].statItem[x]];
+			}
+			else {
+				document.getElementById("contrib" + itemNum).innerHTML += ', ' + equipmentList[itemNum].statContribution[x] + ' ' + statsFriendly[equipmentList[itemNum].statItem[x]];
+			}
 		}
 	}
 }
 
 function searchItemsFn() {
-var searchText = document.getElementById("searchItems").value;
-var cardELEMENT = document.getElementsByClassName('card');
-for (var x = 0; x < cardELEMENT.length; x++) {
-	if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {
-		cardELEMENT[x].hidden = false;
+	var searchText = document.getElementById("searchItems").value;
+	var cardELEMENT = document.getElementsByClassName('card');
+	for (var x = 0; x < cardELEMENT.length; x++) {
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {
+			cardELEMENT[x].hidden = false;
+		}
+		else {
+			cardELEMENT[x].hidden = true;
+		}
 	}
-	else {
-		cardELEMENT[x].hidden = true;
-	}
-}
-
 }
 
 function listEntries() {
-
+  document.getElementById('AUX_NUM').value = '100';
+  totalStats[stats.AUX_POWER] = 100;
+  
 var lenEq = equipmentList.length;
-//This is just temporary to to limited testing before selection
-//for (var bloop = 1; bloop < len; bloop++) {
-//equipmentList[bloop].rarity = Math.floor(Math.random() * 6) + 1;
-//}
 
 var baseMessageItem = '<div class="row">'+
 '<div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);">'+
@@ -1701,12 +2078,15 @@ var baseMessageItem = '<div class="row">'+
 		'MK_INSTANCE'+
 	'</div><div class="container">'+
 		'<p style="margin-left: 57px; padding-top: 5px">BLURB'+
+		'CONTRIBUTIONS'+
 		'SCALING_NOTE'+
 		'RARITY_BUTTONS'+
 		'QTY_NOTE' +
+		
 '</p></div></div></div>';
 var messageData = "";
 for (var x = 0; x < lenEq; x++) {
+
 	messageData += baseMessageItem;
 
 	//Input the actual string and display card
@@ -1739,6 +2119,7 @@ for (var x = 0; x < lenEq; x++) {
 	messageData = messageData.replace("RARITY_ICON", rarityIcons[equipmentList[x].rarity-1]);
 	messageData = messageData.replace("BLURB", equipmentList[x].name);
 	messageData = messageData.replace("MARK_ICON", ROMAN[equipmentList[x].mark]);
+	messageData = messageData.replace("CONTRIBUTIONS", '<span id="contrib'+x+'" style="float:right; margin-right: 10px;color: #998877;">+0</span>');
 	var qtyNote= "Quantity";
 	if (equipmentList[x].qtyLabel != undefined) {
 		qtyNote = equipmentList[x].qtyLabel;
@@ -1751,9 +2132,12 @@ for (var x = 0; x < lenEq; x++) {
 	messageData = messageData.replace('QTY_NOTE', '');
 	}
 
+
 }
 document.getElementById('items').innerHTML = '<div class="column">' + messageData + '</div>';
-
+for (var x = 0; x < lenEq; x++) {
+sumStats(x,0);
+}
 //Output powers
 var baseMessagePower = '<div class="row">'+
 '<div class="card" style="background: rgb(0, 0, 0);">'+
@@ -1780,42 +2164,78 @@ document.getElementById('items').innerHTML += '<div class="column">' + messageDa
 updateTotals();
 }
 function updateTotals() {
-totalStats[5] = 100; //Setting Aux Because there's nothing that sets it otherwise yet
-//totalStats[stats.Cat1_EXOTIC] = 0.04;
 //Particle Manip handling
 var PM_CrtH = Math.min(totalStats[stats.EPG]*0.002,0.5)*PART_MANIP_IS_ACTIVE_OVERLORD;
 var PM_CrtD = totalStats[stats.EPG]*0.001*PART_MANIP_IS_ACTIVE_OVERLORD;
+
 //Aux Power Config handling
 var APC_Cat2 = totalStats[stats.AUX_POWER]*0.0005*AUX_POWER_CONFIG_IS_ACTIVE + 
 totalStats[stats.AUX_POWER]*0.0005*T6_AUX_POWER_CONFIG_IS_ACTIVE*1.25;
+
 //ColCrit Handling
 var CC_CrtD = COLCRIT_ACTIVE*Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05);
+
+	for (var x = 0; x < equipmentList.length; x++) {
+		if (equipmentList[x].name == "Personal Trait - Particle Manipulator") {
+			equipmentList[x].statContribution[0] = Math.round(Math.min(totalStats[stats.EPG]*0.002,0.5)*100)/100;
+			equipmentList[x].statContribution[1] = Math.round(totalStats[stats.EPG]*0.001*100)/100;
+			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]] + ', ' + equipmentList[x].statContribution[1] + ' ' + statsFriendly[equipmentList[x].statItem[1]];
+		}
+		else if (equipmentList[x].name == "Reputation Trait - Auxiliary Power Configuration - Offensive (T5)") {
+			equipmentList[x].statContribution[0] = Math.round(totalStats[stats.AUX_POWER]*0.0005*100)/100;
+			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
+		}
+		else if (equipmentList[x].name == "Reputation Trait - Auxiliary Power Configuration - Offensive (T6)") {
+			equipmentList[x].statContribution[0] = Math.round(totalStats[stats.AUX_POWER]*0.0005*1.25*100)/100;
+			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
+		}
+		else if (equipmentList[x].name == "Deflector with [ColCrit] Modifier") {
+			equipmentList[x].statContribution[0] = Math.round(Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05)*100)/100;
+			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
+		}
+	}
 
 document.getElementById('EPG').innerHTML = Math.round(totalStats[stats.EPG]*1000)/1000;
 document.getElementById('Cat1').innerHTML = Math.round(totalStats[stats.Cat1_EXOTIC]*1000)/1000;
 document.getElementById('Cat2').innerHTML = Math.round((totalStats[stats.Cat2_EXOTIC]+APC_Cat2)*1000)/1000;
 document.getElementById('CrtH').innerHTML = Math.round((totalStats[stats.CrtH_EXOTIC]+PM_CrtH)*1000)/1000;
 document.getElementById('CrtD').innerHTML = Math.round((totalStats[stats.CrtD_EXOTIC]+PM_CrtD+CC_CrtD)*1000)/1000;
-document.getElementById('AUX').innerHTML = Math.round(totalStats[stats.AUX_POWER]*1000)/1000;
-document.getElementById('AUXMAX').innerHTML = Math.round(totalStats[stats.MAX_AUX_POWER]*1000)/1000;
+//document.getElementById('AUXMAX').innerHTML = Math.round(totalStats[stats.MAX_AUX_POWER]*1000)/1000;
 var powerText = [null];
 for (var x = 0; x < powerList.length; x++) {
 	document.getElementById('powerSummary'+x).innerHTML = '';
 	for (var tier = 1; tier <= powerList[x].levels; tier++) {
-		var baseCat1 = 1;
-		if (powerList[x].levelScale) {
-			baseCat1 += 1.86;
-		}
 		switch(powerList[x].equation) {
 		case "A":
-			powerText[tier] = powerList[x].base[tier] * (baseCat1+totalStats[1]+totalStats[0]*0.005) * (1+totalStats[2])
+			powerText[tier] = powerList[x].base[tier] * (1+powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005) * (1+totalStats[stats.Cat2_EXOTIC])
+			if(powerList[x].auxScale) {
+				powerText[tier] *= (0.005 * totalStats[stats.AUX_POWER] + 0.5);
+			}
+			break;
+		case "B":
+			powerText[tier] = powerList[x].base[tier] * (1+powerList[x].baseCat1+totalStats[1])*(1+totalStats[stats.EPG]*0.005) * (1+totalStats[stats.Cat2_EXOTIC])
+			if(powerList[x].auxScale) {
+				powerText[tier] *= (0.005 * totalStats[stats.AUX_POWER] + 0.5);
+			}
+			break;
+		case "TWC":
+			powerText[tier] = powerList[x].base[tier] * ((powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005) * (totalStats[stats.Cat2_EXOTIC])+(powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005)+(totalStats[stats.Cat2_EXOTIC])+4)
+			break;
+		case "TC":
+			powerText[tier] = powerList[x].base[tier] * (1+powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005) * (1+totalStats[stats.Cat2_EXOTIC])
+			if (tier == 1) {
+			powerText[tier] *= (0.0034 * totalStats[stats.AUX_POWER] + 0.659);
+			}
+			else if (tier == 2) {
+			powerText[tier] *= (0.0031 * totalStats[stats.AUX_POWER] + 0.687);
+			}
+			else if (tier == 3) {
+			powerText[tier] *= (0.0028 * totalStats[stats.AUX_POWER] + 0.715);
+			}
 			break;
 		default:
 			console.log("There is an equiation that is set up poorly for " + powerList[x].name);
 			break;
-		}
-		if(powerList[x].auxScale) {
-			powerText[tier] *= (0.005 * totalStats[5] + 0.5);
 		}
 		powerText[tier] = Math.round(powerText[tier]*10)/10;
 		document.getElementById('powerSummary'+x).innerHTML += "Rank " + tier + ": " + powerText[tier] + ' | ';
