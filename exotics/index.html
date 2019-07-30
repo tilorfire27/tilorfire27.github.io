@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="utf-8"/>
 <style>
 body {
     background-color: #AAAAAA;
 }
-
 .imageWrapper {
   position: relative;
 }
@@ -23,11 +23,9 @@ body {
   background: #000000;
   color: #FFFFFF;
 }
-
 .card:hover {
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
 }
-
 /* Add some padding inside the card container */
 .container {
   height: 76px;
@@ -44,7 +42,6 @@ img {
   width: 45%;
   padding: 15px;
 }
-
 /* Clear floats after the columns */
 .row:after {
   content: "";
@@ -59,12 +56,10 @@ img {
 #number {
 	width: 3em;
 }
-
 </style>
 <title>Tilor's Exotic Damage Calculator</title>
 </head>
 <body onLoad="listEntries()">
-
 <h2>Exotic Damage Calculator</h2>
 <p><abbr title="Exotic Particle Generator Points">EPG</abbr>: <span id="EPG">0</span><br>
 <abbr title='Category 1 Damage, typically equivalent to 0.5% EPG + "Exotic Damage"'>Cat1</abbr>: <span id="Cat1">0</span><br>
@@ -72,18 +67,27 @@ img {
 Exotic <abbr title='Critical Hit Chance'>CrtH</abbr>: <span id="CrtH">0</span><br>
 Exotic <abbr title='Critical Hit Severity'>CrtD</abbr>: <span id="CrtD">0</span><br>
 Auxiliary Power: <span id="AUX"><input id="AUX_NUM" type="number" value="100" min="0" max="200" style="width:3em" onclick="setAux(this,event)" onkeyup="setAux(this,event)"></span><br>
-
 <label for="searchItems">Search: </label>
-<input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
+<input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()"><br>
+<label for="restorePointIn">Restore: </label>
+<input type="text" id="restorePointIn" name="restorePointIn" placeholder="Restore...">
+<input type="button" value="Restore" onclick="restoreItemsFn()">
+<input type="button" value="Clear" onclick="clearRestoreFn()">
+<input type="button" value="Copy" onclick="createRestoreFn()"> <abbr title='This will copy the restore string to the clipboard'>?</abbr>
 <p id="items"></p>
 <script>
-
+//These are global variables that trigger when certain special powers are used. 
 var PART_MANIP_IS_ACTIVE_OVERLORD = false;
 var AUX_POWER_CONFIG_IS_ACTIVE = false;
 var T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
 var COLCRIT_ACTIVE = false;
 var COLCRIT_HULL = 100;
+//Creating an empty array for the stats to be stored in
 var totalStats=[0,0,0,0,0,0,0,0,0];
+//The restore point is made with |#|, where the # is the item to be turned on. Obviously, different versions will totally scramble the restore point as items are added
+var restorePoint="|";
+//Constants are values that make it easy to have constant spelling for things
+//Rarities, #s for Mark + Rarity scaling
 const rarity = {
 COMMON: 1,
 UNCOMMON: 2,
@@ -92,7 +96,9 @@ VERY_RARE: 4,
 ULTRA_RARE: 5,
 EPIC: 6
 };
+//Rarity Icons, takes the value from above and puts in an icon from this array
 var rarityIcons = ["Common_icon.png", "Uncommon_icon.png", "Rare_icon.png", "Very_rare_icon.png", "Ultra_rare_icon.png", "Epic_icon.png"];
+//Stats are referred to and summed up later. The total stats array has values that correspond from each power
 const stats = {
 EPG: 0,//"Exotic Particle Generator",
 Cat1_EXOTIC: 1,//"Cat1 Exotic Damage",
@@ -102,6 +108,7 @@ CrtH_EXOTIC: 4,//"Critical Hit Chance - Exotic",
 AUX_POWER: 5,//"Auxiliary Power",
 MAX_AUX_POWER: 6,//"Auxiliary Power Capacity Increase"
 };
+//These are the friendly names for each stat, for printing on the screen
 var statsFriendly = ["EPG",//"Exotic Particle Generator",
 "Cat1",//"Cat1 Exotic Damage",
 "Cat2",//"Cat2 Exotic Damage",
@@ -110,16 +117,19 @@ var statsFriendly = ["EPG",//"Exotic Particle Generator",
 "Aux Power",//"Auxiliary Power",
 "Max Aux Power"]//"Auxiliary Power Capacity Increase"
 //Maximum Auxiliary Power: <span id="AUXMAX">0</span></p>  Put this back if we want to track max
+//So far, everything only scales one of the ways below. This lets us do math based on which way it is
 const statScaling = {
 FIXED: "Fixed",
 MARK_ONLY: "Mark Only",
 MARK_AND_RARITY: "Mark and Rarity"
 };
+//There is no ROMAN function, and this also lets us build the icon name
 const ROMAN = [null,"_I_","_II_","_III_","_IV_","_V_","_VI_","_VII_","_VIII_","_IX_","_X_","_XI_","_XII_","_XIII_","_XIV_","_XV_","inf"];
+//Some defaults that can be copied down so that things get easier. If max mark increases, change this so everything defaults to max
 var defaultMark = 15;
 var defaultQty = 1;
+//This is the empty array that we will push the list of equipment onto
 var equipmentList = [ ];
-var maxStats = 2;
 
 equipmentList.push({name:"Skill - Starship Exotic Particle Generators Skill",
 mark:1,
@@ -1695,8 +1705,10 @@ statContribution:[0.05],
 quantity:1,
 maxQty:1,
 unique:true});
+//End of the equipment list
 
 //POWERS---------------------------------------------------------------------------------------------
+//Again, another empty array that we push powers into
 var powerList = [ ];
 
 powerList.push({name:"Anti-Time Entanglement Singularity",
@@ -1907,174 +1919,226 @@ baseCat1:1.8863,
 damageType:"Kinetic"});
 
 //MATHS----------------------------------------------------------------------------------------------
+//This function will flip the color of the card. If the card is black, it will flip to color, otherwise it will flip to black.
 function flipColor(cardID) {
-	var backString = cardID.style.background;
-	backString = backString.slice(4, backString.indexOf(")"));
-	var seld;
+	var backString = cardID.style.background; //gets the current card background
+	backString = backString.slice(4, backString.indexOf(")")); //slices down to just the color, probably a better way to do this
+	var seld; //seld is used as a multiplier to add or remove stats
 	if (backString == "0, 0, 0") {
-		cardID.style.background = '#222288';
-		seld = 1;
+		cardID.style.background = '#222288'; //change this HEX value in order to change the color of the selected card
+		seld = 1; //seld of 1 means the stats will be added to the total
 	}
 	else {
-		cardID.style.background = '#000000';
-		seld = -1;
+		cardID.style.background = '#000000'; //change this HEX value in order to change the color of the deselected card, but it's also used in the IF
+		seld = -1; //seld of -1 means the stats will be removed from the total
 	}
-	for (var x = 0; x < equipmentList.length; x++) {
+	for (var x = 0; x < equipmentList.length; x++) {//These are the special cases for some of the powers that scale off inputs
 		if(cardID.innerHTML.indexOf(equipmentList[x].name) > -1) {
-					if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == 1) {
-		PART_MANIP_IS_ACTIVE_OVERLORD = true;
-		}
-		else if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == -1) {
-		PART_MANIP_IS_ACTIVE_OVERLORD = false;
-		}
-		else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T5)")> -1 && seld == 1) {
-		AUX_POWER_CONFIG_IS_ACTIVE = true;
-		}
-		else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T5)")> -1 && seld == -1) {
-		AUX_POWER_CONFIG_IS_ACTIVE = false;
-		}
-		else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T6)")> -1 && seld == 1) {
-		T6_AUX_POWER_CONFIG_IS_ACTIVE = true;
-		}
-		else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T6)")> -1 && seld == -1) {
-		T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
-		}
-		else if(cardID.innerHTML.indexOf("ColCrit")> -1 && seld == 1) {
-		COLCRIT_ACTIVE = true;
-		COLCRIT_HULL = equipmentList[x].quantity;
-		}
-		else if(cardID.innerHTML.indexOf("ColCrit")> -1 && seld == -1) {
-		COLCRIT_ACTIVE = false;
-		COLCRIT_HULL = equipmentList[x].quantity;
-		}
-			sumStats(x,seld);
+			if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == 1) {
+			PART_MANIP_IS_ACTIVE_OVERLORD = true;
+			}
+			else if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == -1) {
+			PART_MANIP_IS_ACTIVE_OVERLORD = false;
+			}
+			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T5)")> -1 && seld == 1) {
+			AUX_POWER_CONFIG_IS_ACTIVE = true;
+			}
+			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T5)")> -1 && seld == -1) {
+			AUX_POWER_CONFIG_IS_ACTIVE = false;
+			}
+			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T6)")> -1 && seld == 1) {
+			T6_AUX_POWER_CONFIG_IS_ACTIVE = true;
+			}
+			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T6)")> -1 && seld == -1) {
+			T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
+			}
+			else if(cardID.innerHTML.indexOf("ColCrit")> -1 && seld == 1) {
+			COLCRIT_ACTIVE = true;
+			COLCRIT_HULL = equipmentList[x].quantity;
+			}
+			else if(cardID.innerHTML.indexOf("ColCrit")> -1 && seld == -1) {
+			COLCRIT_ACTIVE = false;
+			COLCRIT_HULL = equipmentList[x].quantity;
+			}
+			sumStats(x,seld);//Take the power and add it into the main stats
 		}
 	}
-	updateTotals();
+	updateTotals();//Updates the values shown at the top
 }
+//This is the function that scales the rarity up and down
 function rarClick(cardID,event) {
-	event.stopPropagation();
-var mainCard = cardID.parentNode.parentNode.parentNode;
-var rarityUP = (cardID.value == "Upgrade Rarity");
-var rarityCurrent;
-var rarityNew;
-	var backString = mainCard.style.background;
-	backString = backString.slice(4, backString.indexOf(")"));
-	if (backString != "0, 0, 0") {
+	event.stopPropagation();//Prevents the buttons on the card from flipping the card color
+var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
+var rarityUP = (cardID.value == "Upgrade Rarity");//If the button pushed is "Upgrade", true, otherwise, false ("downgrade")
+var rarityCurrent;//variable for the current rarity
+var rarityNew;//variable for the new rarity
+var backString = mainCard.style.background;//get the card background
+backString = backString.slice(4, backString.indexOf(")"));
+	if (backString != "0, 0, 0") {//if the card is turned on, turn it off before upgrading
 		flipColor(mainCard);
 	}
-	for (var x = 0; x < equipmentList.length; x++) {
-		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
-			rarityCurrent = equipmentList[x].rarity;
-		if (rarityUP) {
-			rarityNew = Math.min(rarityCurrent + 1, 6);
-			//alert("Power UP");
+	for (var x = 0; x < equipmentList.length; x++) {//loop through all the equipment
+		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {//figure out which card we are looking at
+			rarityCurrent = equipmentList[x].rarity;//Get the current rarity from the list
+		if (rarityUP) {//If you want to upgrade the rarity...
+			rarityNew = Math.min(rarityCurrent + 1, 6);//Max out at 6, which is currently the highest rarity
 		}
-		else if (!rarityUP) {
-			rarityNew = Math.max(rarityCurrent - 1, 1);
-			//alert("Power DOWN");
+		else if (!rarityUP) {//And if you want to downgrade...
+			rarityNew = Math.max(rarityCurrent - 1, 1);//Min out at 1, which is the lowest rarity
 		}
 		else {
-			alert("There is an error with rarity selection");
+			alert("There is an error with rarity selection");//It's a boolean, so we should never see this case
 		}
-		equipmentList[x].rarity = rarityNew;
-		mainCard.children[0].children[1].src = mainCard.children[0].children[1].src.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);
+		equipmentList[x].rarity = rarityNew;//Change the item in the array to the new rarity
+		mainCard.children[0].children[1].src = mainCard.children[0].children[1].src.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);//Change the rarity icon to the new rarity icon
 		}
 	}
-	if (backString != "0, 0, 0") {
+	if (backString != "0, 0, 0") {//if the card was turned on before, turn it back on, otherwise leave it alone
 		flipColor(mainCard);
 	}
 }
+//This will set the AUX power from the input at the top of the website, this will persist even if all of the consoles have +power because of power setting
 function setAux(cardID,event) {
-//console.log(cardID.value);
 totalStats[stats.AUX_POWER] = cardID.value;
 updateTotals();
 }
-
+//This function upgrades or downgrades the rarity
 function upgClickSpin(cardID,event) {
-	event.stopPropagation();
-var mainCard = cardID.parentNode.parentNode.parentNode;
-var markCurrent;
-var markNew = cardID.value;
-var backString = mainCard.style.background;
-	backString = backString.slice(4, backString.indexOf(")"));
-	if (backString != "0, 0, 0") {
+	event.stopPropagation();//Prevents the buttons on the card from flipping the card color
+var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
+var markCurrent;//Variable for the current mark
+var markNew = cardID.value;//This is the value from the number input, which is to set the new mark
+var backString = mainCard.style.background;//get the card background (I really am starting to think this could be applied to the equipment instead of the card...)
+backString = backString.slice(4, backString.indexOf(")"));
+	if (backString != "0, 0, 0") {//if the card is turned on, turn it off before upgrading
 		flipColor(mainCard);
 	}
-	for (var x = 0; x < equipmentList.length; x++) {
-		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
-			markCurrent = equipmentList[x].mark;
-			equipmentList[x].mark = Number(markNew);
-			mainCard.children[0].children[2].src = mainCard.children[0].children[2].src.replace(ROMAN[markCurrent], ROMAN[markNew]);
+	for (var x = 0; x < equipmentList.length; x++) {//loop through all the equipment
+		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {//figure out which card we are looking at
+			markCurrent = equipmentList[x].mark;//Get the current mark from the list
+			equipmentList[x].mark = Number(markNew);//Set the mark back into the equipment list
+			mainCard.children[0].children[2].src = mainCard.children[0].children[2].src.replace(ROMAN[markCurrent], ROMAN[markNew]);//Change the icon for the mark to the new mark
 		}
 	}
-	if (backString != "0, 0, 0") {
+	if (backString != "0, 0, 0") {//if the card was turned on before, turn it back on, otherwise leave it alone
 		flipColor(mainCard);
 	}
 }
-
+//This function controls the quantity multiplier
 function qtyClickSpin(cardID,event) {
-	event.stopPropagation();
-var mainCard = cardID.parentNode.parentNode.parentNode;
-var qtyCurrent;
-var qtyNew = cardID.value;
-var backString = mainCard.style.background;
-	backString = backString.slice(4, backString.indexOf(")"));
-	if (backString != "0, 0, 0") {
+	event.stopPropagation();//Prevents the buttons on the card from flipping the card color
+var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
+var qtyCurrent;//Variable to store the current quantity
+var qtyNew = cardID.value;//This is the value from the number input, which is to set the new quantity
+var backString = mainCard.style.background;//get the card background 
+backString = backString.slice(4, backString.indexOf(")"));
+	if (backString != "0, 0, 0") {//if the card is turned on, turn it off before upgrading
 		flipColor(mainCard);
 	}
-	for (var x = 0; x < equipmentList.length; x++) {
-		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {
-			qtyCurrent = equipmentList[x].quantity;
-			equipmentList[x].quantity = Number(qtyNew);
+	for (var x = 0; x < equipmentList.length; x++) {//loop through all the equipment
+		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {//figure out which card we are looking at
+			qtyCurrent = equipmentList[x].quantity;//Get the current quantity from the list
+			equipmentList[x].quantity = Number(qtyNew);//Set the new quantity to the list
 		}
 	}
-	if (backString != "0, 0, 0") {
+	if (backString != "0, 0, 0") {//if the card was turned on before, turn it back on, otherwise leave it alone
 		flipColor(mainCard);
 	}
 }
-
+//This function adds or removes the stat contributions from each item
 function sumStats(itemNum,seld) {
-	for (var x = 0; x < 3; x++) {
-		if (equipmentList[itemNum].statValue[x] != undefined) {
-			equipmentList[itemNum].statContribution[x] = 0;
-			switch(equipmentList[itemNum].statType[x]) {
-				case statScaling.MARK_AND_RARITY:
+	for (var x = 0; x < Object.keys(stats).length; x++) {//loop through as many stats as there are
+		if (equipmentList[itemNum].statValue[x] != undefined) {//If there is a stat contribution, add it here
+			equipmentList[itemNum].statContribution[x] = 0;//set the stat contribution to 0
+			switch(equipmentList[itemNum].statType[x]) {//Figure out how the stat scales
+				case statScaling.MARK_AND_RARITY://Mark and rarity will take QTY * STAT * (Mk + Rarity)
 				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
 				break;
-				case statScaling.MARK_ONLY:
+				case statScaling.MARK_ONLY://Mark only will take QTY * STAT * (1+ Rarity) in most cases, new cases needed if this isn't the case
 				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (1 + equipmentList[itemNum].mark);
 				break;
-				case statScaling.FIXED:
+				case statScaling.FIXED://FIXED Doesn't care about mark or rarity. Even some things that can be upgraded will have fixed stats
 				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x];
 				break;
-				default:
+				default://If it isn't one of these types of issues, then we need to throw an error
 				console.log("There's a problem summing stats for " + equipmentList[itemNum].name + " " +x);
 			}
-			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].statContribution[x];
-			equipmentList[itemNum].statContribution[x] = Math.round(equipmentList[itemNum].statContribution[x]*100)/100
-			if (x == 0) {
+			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].statContribution[x];//Add or remove the stat from the totals
+			equipmentList[itemNum].statContribution[x] = Math.round(equipmentList[itemNum].statContribution[x]*100)/100//Update the contribution value on the card
+			if (seld == 1) {//If we are turning on the power, add it to the restore string
+			restorePoint += itemNum + "|";
+			}
+			else if (seld == -1) {//if we are removing the power, then we need to pull it out of the restore string wherever it might be
+			restorePoint = restorePoint.replace(itemNum + "|", "");
+			}
+			if (x == 0) {//Update the contribution string for the card. For the first item, its "+BLAH"
 				document.getElementById("contrib" + itemNum).innerHTML = '+' + equipmentList[itemNum].statContribution[x] + ' ' + statsFriendly[equipmentList[itemNum].statItem[x]];
 			}
-			else {
+			else {//For 1+n items, its ", BLAH"
 				document.getElementById("contrib" + itemNum).innerHTML += ', ' + equipmentList[itemNum].statContribution[x] + ' ' + statsFriendly[equipmentList[itemNum].statItem[x]];
 			}
 		}
 	}
 }
+//Function that can push things to the clipboard
+function copyStringToClipboard (str) {
+   // Create new element
+   var el = document.createElement('textarea');
+   // Set value (string to be copied)
+   el.value = str;
+   // Set non-editable to avoid focus and move outside of view
+   el.setAttribute('readonly', '');
+   el.style = {position: 'absolute', left: '-9999px'};
+   document.body.appendChild(el);
+   // Select text inside element
+   el.select();
+   // Copy text to clipboard
+   document.execCommand('copy');
+   // Remove temporary element
+   document.body.removeChild(el);
+}
 
+//Search function that hides everything that doesn't match the search
 function searchItemsFn() {
-	var searchText = document.getElementById("searchItems").value;
-	var cardELEMENT = document.getElementsByClassName('card');
-	for (var x = 0; x < cardELEMENT.length; x++) {
-		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {
-			cardELEMENT[x].hidden = false;
+	var searchText = document.getElementById("searchItems").value;//Get the search string
+	var cardELEMENT = document.getElementsByClassName('card');//Get all of the cards
+	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
+			cardELEMENT[x].hidden = false;//Hide the card
 		}
-		else {
-			cardELEMENT[x].hidden = true;
+		else {//Otherwise...
+			cardELEMENT[x].hidden = true;//show the card
+		}
+	}//Obviously an empty search string matches everything
+}
+//Takes a restore string and turns on and off cards that match it
+function restoreItemsFn() {
+	var searchText = document.getElementById("restorePointIn").value;//Get the search string (only on the Restore button press)
+	var cardELEMENT = document.getElementsByClassName('card');//Get all of the cards
+	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
+		var backString = cardELEMENT[x].style.background;//Get the background (again)
+		backString = backString.slice(4, backString.indexOf(")"));
+		if (searchText.indexOf("|" + x + "|") > -1) {//If the ID of the card is in the restore string, go ahead and do this
+			if (backString == "0, 0, 0" ) {//If the card is off, turn it on
+				flipColor(cardELEMENT[x]);
+			}
+		}
+		else {//If the ID isn't in the restore string, then we need to turn it off
+			if (backString != "0, 0, 0" ) {
+				flipColor(cardELEMENT[x]);
+			}
 		}
 	}
 }
+//Clears the restore input box
+function clearRestoreFn() {
+document.getElementById("restorePointIn").value = ""
+}
+//Pushes the restore string that is in the background to the clipboard for easy sharing
+function createRestoreFn() {
+copyStringToClipboard(restorePoint);
+}
+//Compare used for the sorting of the lists
 function compare(a,b) {
 	if (a.name < b.name) {
 		return -1;
@@ -2084,15 +2148,16 @@ function compare(a,b) {
 	}
 	return 0;
 }
+//This function runs on page load and generates all of the cards
 function listEntries() {
-equipmentList.sort(compare);
-powerList.sort(compare);
-document.getElementById('AUX_NUM').value = '100';
-totalStats[stats.AUX_POWER] = 100;
+equipmentList.sort(compare);//Sort the equipment
+powerList.sort(compare);//Sort the powers
+document.getElementById('AUX_NUM').value = '100';//Reset the AUX to 100
+totalStats[stats.AUX_POWER] = 100;//Reset the AUX to 100
   
-var lenEq = equipmentList.length;
+var lenEq = equipmentList.length;//Get the number of equipments
 
-var baseMessageItem = '<div class="row">'+
+var baseMessageItem = '<div class="row">'+//This is the base HTML for a card, but has fillers based on what is chosen or not
 '<div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);">'+
 	'<div class="imageWrapper">'+
 		'<img class="overlayImage" src="img/ITEM_ICON" alt="Icon">'+
@@ -2104,10 +2169,9 @@ var baseMessageItem = '<div class="row">'+
 		'SCALING_NOTE'+
 		'RARITY_BUTTONS'+
 		'QTY_NOTE' +
-		
 '</p></div></div></div>';
 var messageData = "";
-for (var x = 0; x < lenEq; x++) {
+for (var x = 0; x < lenEq; x++) {//Loop through all of the items
 
 	messageData += baseMessageItem;
 
@@ -2157,6 +2221,7 @@ for (var x = 0; x < lenEq; x++) {
 
 }
 document.getElementById('items').innerHTML = '<div class="column">' + messageData + '</div>';
+//Now that we have all of the cards, we have to sum all of the stats in order to display on the cards
 for (var x = 0; x < lenEq; x++) {
 sumStats(x,0);
 }
@@ -2185,6 +2250,8 @@ for (var x = 0; x < lenPw; x++) {
 document.getElementById('items').innerHTML += '<div class="column">' + messageDataX + '</div>';
 updateTotals();
 }
+
+//This function updates the totals by summing up each contribution and a lot of special cases
 function updateTotals() {
 //Particle Manip handling
 var PM_CrtH = Math.min(totalStats[stats.EPG]*0.002,0.5)*PART_MANIP_IS_ACTIVE_OVERLORD;
@@ -2196,7 +2263,6 @@ totalStats[stats.AUX_POWER]*0.0005*T6_AUX_POWER_CONFIG_IS_ACTIVE*1.25;
 
 //ColCrit Handling
 var CC_CrtD = COLCRIT_ACTIVE*Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05);
-
 	for (var x = 0; x < equipmentList.length; x++) {
 		if (equipmentList[x].name == "Personal Trait - Particle Manipulator") {
 			equipmentList[x].statContribution[0] = Math.round(Math.min(totalStats[stats.EPG]*0.002,0.5)*100)/100;
@@ -2211,12 +2277,11 @@ var CC_CrtD = COLCRIT_ACTIVE*Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05);
 			equipmentList[x].statContribution[0] = Math.round(totalStats[stats.AUX_POWER]*0.0005*1.25*100)/100;
 			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
 		}
-		else if (equipmentList[x].name == "Deflector with [ColCrit] Modifier") {
+		else if (equipmentList[x].name == "Modifier - Deflector with [ColCrit]") {
 			equipmentList[x].statContribution[0] = Math.round(Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05)*100)/100;
 			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
 		}
 	}
-
 document.getElementById('EPG').innerHTML = Math.round(totalStats[stats.EPG]*1000)/1000;
 document.getElementById('Cat1').innerHTML = Math.round(totalStats[stats.Cat1_EXOTIC]*1000)/1000;
 document.getElementById('Cat2').innerHTML = Math.round((totalStats[stats.Cat2_EXOTIC]+APC_Cat2)*1000)/1000;
@@ -2224,26 +2289,27 @@ document.getElementById('CrtH').innerHTML = Math.round((totalStats[stats.CrtH_EX
 document.getElementById('CrtD').innerHTML = Math.round((totalStats[stats.CrtD_EXOTIC]+PM_CrtD+CC_CrtD)*1000)/1000;
 //document.getElementById('AUXMAX').innerHTML = Math.round(totalStats[stats.MAX_AUX_POWER]*1000)/1000;
 var powerText = [null];
+//This sums up the power tooltip values, based on the different types of equations
 for (var x = 0; x < powerList.length; x++) {
 	document.getElementById('powerSummary'+x).innerHTML = '';
 	for (var tier = 1; tier <= powerList[x].levels; tier++) {
 		switch(powerList[x].equation) {
-		case "A":
+		case "A"://Normal equation
 			powerText[tier] = powerList[x].base[tier] * (1+powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005) * (1+totalStats[stats.Cat2_EXOTIC])
 			if(powerList[x].auxScale) {
 				powerText[tier] *= (0.005 * totalStats[stats.AUX_POWER] + 0.5);
 			}
 			break;
-		case "B":
+		case "B"://EPG is seperate factor in the equation (there's a few of these)
 			powerText[tier] = powerList[x].base[tier] * (1+powerList[x].baseCat1+totalStats[1])*(1+totalStats[stats.EPG]*0.005) * (1+totalStats[stats.Cat2_EXOTIC])
 			if(powerList[x].auxScale) {
 				powerText[tier] *= (0.005 * totalStats[stats.AUX_POWER] + 0.5);
 			}
 			break;
-		case "TWC":
+		case "TWC"://Tholian web cannon is Base * (Cat1*Cat2 + Cat1 + Cat2 + 4)
 			powerText[tier] = powerList[x].base[tier] * ((powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005) * (totalStats[stats.Cat2_EXOTIC])+(powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005)+(totalStats[stats.Cat2_EXOTIC])+4)
 			break;
-		case "TC":
+		case "TC"://Timeline collapse has a different AUX scaling
 			powerText[tier] = powerList[x].base[tier] * (1+powerList[x].baseCat1+totalStats[stats.Cat1_EXOTIC]+totalStats[stats.EPG]*0.005) * (1+totalStats[stats.Cat2_EXOTIC])
 			if (tier == 1) {
 			powerText[tier] *= (0.0034 * totalStats[stats.AUX_POWER] + 0.659);
@@ -2255,18 +2321,17 @@ for (var x = 0; x < powerList.length; x++) {
 			powerText[tier] *= (0.0028 * totalStats[stats.AUX_POWER] + 0.715);
 			}
 			break;
-		default:
+		default://If there is an equation type called that isn't set up yet
 			console.log("There is an equiation that is set up poorly for " + powerList[x].name);
 			break;
 		}
-		powerText[tier] = Math.round(powerText[tier]*10)/10;
-		document.getElementById('powerSummary'+x).innerHTML += "Rank " + tier + ": " + powerText[tier] + ' | ';
+		powerText[tier] = Math.round(powerText[tier]*10)/10;//Rounds the tooltip value to 1 decimal place
+		document.getElementById('powerSummary'+x).innerHTML += "Rank " + tier + ": " + powerText[tier] + ' | ';//Updates the power card with the calculated values
 	}
 	var tempString = document.getElementById('powerSummary'+x).innerHTML;
 	document.getElementById('powerSummary'+x).innerHTML = tempString.slice(0,tempString.length-3);
 }
 }
 </script>
-
 </body>
 </html>
