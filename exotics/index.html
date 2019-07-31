@@ -68,7 +68,8 @@ Exotic <abbr title='Critical Hit Chance'>CrtH</abbr>: <span id="CrtH">0</span><b
 Exotic <abbr title='Critical Hit Severity'>CrtD</abbr>: <span id="CrtD">0</span><br>
 Auxiliary Power: <span id="AUX"><input id="AUX_NUM" type="number" value="100" min="0" max="200" style="width:3em" onclick="setAux(this,event)" onkeyup="setAux(this,event)"></span><br>
 <label for="searchItems">Search: </label>
-<input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()"><br>
+<input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
+<input type="button" value="Clear" onclick="clearSearchFn()"><br>
 <label for="restorePointIn">Restore: </label>
 <input type="text" id="restorePointIn" name="restorePointIn" placeholder="Restore...">
 <input type="button" value="Restore" onclick="restoreItemsFn()">
@@ -76,14 +77,9 @@ Auxiliary Power: <span id="AUX"><input id="AUX_NUM" type="number" value="100" mi
 <input type="button" value="Copy" onclick="createRestoreFn()"> <abbr title='This will copy the restore string to the clipboard'>?</abbr>
 <p id="items"></p>
 <script>
-//These are global variables that trigger when certain special powers are used. 
-var PART_MANIP_IS_ACTIVE_OVERLORD = false;
-var AUX_POWER_CONFIG_IS_ACTIVE = false;
-var T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
-var COLCRIT_ACTIVE = false;
-var COLCRIT_HULL = 100;
 //Creating an empty array for the stats to be stored in
 var totalStats=[0,0,0,0,0,0,0,0,0];
+var preTotalStats=[0,0,0,0,0,0,0,0,0];
 //The restore point is made with |#|, where the # is the item to be turned on. Obviously, different versions will totally scramble the restore point as items are added
 var restorePoint="|";
 //Constants are values that make it easy to have constant spelling for things
@@ -132,6 +128,7 @@ var defaultQty = 1;
 var equipmentList = [ ];
 
 equipmentList.push({name:"Skill - Starship Exotic Particle Generators Skill",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Science_Skill_4_R1.png",
@@ -145,6 +142,7 @@ qtyLabel:"EPG",
 unique:true});
 
 equipmentList.push({name:"Specialization - Temporal Operative",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Specialization_Temporal_Operative_icon.png",
@@ -157,6 +155,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Mastery - Enhanced Particle Generators",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"37px-Mastery_passive_enhanced_particle_generators_tac_fed.png",
@@ -170,6 +169,7 @@ qtyLabel:"Points",
 unique:true});
 
 equipmentList.push({name:"Starship Support Configuration - Temporal Ships",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Support_Configuration_icon.png",
@@ -182,6 +182,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Attack Pattern Delta Prime",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Attack_Pattern_Delta_Prime_icon.png",
@@ -195,6 +196,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Designated Target",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Mastery_trait_designated_target.png",
@@ -207,6 +209,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Checkmate",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Check_Mate_icon.png",
@@ -219,6 +222,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Emitter Synergy",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Emitter_Synergy_icon.png",
@@ -232,6 +236,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Exotic Modulation",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Exotic_Modulation_icon.png",
@@ -244,6 +249,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - History Will Remember",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"History_Will_Remember_icon.png",
@@ -257,6 +263,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Improved Critical Systems",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Improved_Critical_Systems_icon.png",
@@ -269,6 +276,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Improved Photonic Officer",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Improved_Photonic_Officer_icon.png",
@@ -281,6 +289,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Improved Feedback Pulse",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Mastery_trait_improved_feedback_pulse.png",
@@ -294,6 +303,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Insidious Tactics",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Insidious_Tactics_icon.png",
@@ -307,6 +317,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Kick Them While They're Down",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Kick_Them_While_Theyre_Down_icon.png",
@@ -320,6 +331,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Numerical Superiority",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Numerical_Superiority_icon.png",
@@ -332,6 +344,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Partners in Arms",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Partners_In_Arms_icon.png",
@@ -345,6 +358,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Time to Kill",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Time_to_Kill_icon.png",
@@ -358,6 +372,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Superior Pedal to the Metal",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Pedal_to_the_Metal_icon.png",
@@ -371,6 +386,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Improved Petal to the Metal",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Pedal_to_the_Metal_icon.png",
@@ -384,6 +400,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Petal to the Metal",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Pedal_to_the_Metal_icon.png",
@@ -397,6 +414,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Strike from Shadows",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Strike_from_Shadows_icon.png",
@@ -409,6 +427,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Terran Machinations",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Terran_Machinations_icon.png",
@@ -421,6 +440,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Unconventional Tactics",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Unconventional_Tactics_icon.png",
@@ -433,6 +453,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Starship Trait - Improved Unconventional Tactics",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Unconventional_Tactics_icon.png",
@@ -445,6 +466,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Anchored",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Anchored_icon.png",
@@ -458,6 +480,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Conservation of Energy",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Conservation_of_Energy_icon.png",
@@ -471,6 +494,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Context is for Kings",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Context_is_for_Kings_icon.png",
@@ -484,6 +508,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Duelist's Fervor",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Duelists_Fervor_icon.png",
@@ -497,6 +522,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Enlightened",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Enlightened_icon.png",
@@ -509,6 +535,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Fleet Coordinator",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Fleet_Coordinator_icon.png",
@@ -522,6 +549,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Inspirational Leader",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Inspirational_Leader_icon.png",
@@ -535,6 +563,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Operative",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Operative_icon.png",
@@ -547,11 +576,12 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Particle Manipulator",//This one is special...
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Particle_Manipulator_icon.png",
 statItem:[stats.CrtH_EXOTIC,stats.CrtD_EXOTIC],
-statType:[statScaling.FIXED,statScaling.FIXED],
+statType:["PM CrtH","PM CrtD"],
 statValue:[0,0],
 statContribution:[0,0],
 quantity:1,
@@ -559,6 +589,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Positive Feedback Loop",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Positive_Feedback_Loop_icon.png",
@@ -571,6 +602,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Romulan Operative",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Romulan_Operative_icon.png",
@@ -583,6 +615,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Trait - Terran Targeting Systems",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Terran_Targeting_Systems_icon.png",
@@ -595,6 +628,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Advanced Targeting Systems (T5)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Advanced_Targeting_Systems_icon.png",
@@ -607,6 +641,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Precision (T5)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Precision_icon.png",
@@ -619,6 +654,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Particle Generator Amplifier (T5)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Particle_Generator_Amplifier_icon.png",
@@ -631,6 +667,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Counter-Stroke (T5)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Counter-Stroke_icon.png",
@@ -643,11 +680,12 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Auxiliary Power Configuration - Offense (T5)",//This one is special too...
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Auxiliary_Power_Configuration_-_Offense_icon.png",
 statItem:[stats.Cat1_EXOTIC],
-statType:[statScaling.FIXED],
+statType:["APC5"],
 statValue:[0],
 statContribution:[0],
 quantity:1,
@@ -655,6 +693,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Advanced Targeting Systems (T6)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Advanced_Targeting_Systems_icon.png",
@@ -667,6 +706,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Precision (T6)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Precision_icon.png",
@@ -679,6 +719,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Particle Generator Amplifier (T6)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Particle_Generator_Amplifier_icon.png",
@@ -691,6 +732,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Counter-Stroke (T6)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Counter-Stroke_icon.png",
@@ -703,11 +745,12 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Auxiliary Power Configuration - Offense (T6)",//This one is special too...
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Auxiliary_Power_Configuration_-_Offense_icon.png",
 statItem:[stats.Cat1_EXOTIC],
-statType:[statScaling.FIXED],
+statType:["APC6"],
 statValue:[0],
 statContribution:[0],
 quantity:1,
@@ -715,6 +758,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Captain Power - Attack Pattern Alpha III",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Attack_Pattern_Alpha_icon_Klingon.png",
@@ -727,6 +771,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Decloak Ambush",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Voth_Cloak_icon_Romulan.png",
@@ -739,6 +784,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Decloak Ambush + Bridge Officers - Subterfuge",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Subterfuge_icon.png",
@@ -751,6 +797,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Decloak Ambush + Bridge Officers - Superior Subterfuge",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Subterfuge_icon.png",
@@ -763,6 +810,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Captain Power - Focus Frenzy + Frenzied Assault",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Focused_Frenzy_icon_Federation.png",
@@ -776,6 +824,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Captain Power - Go Down Fighting",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Go_Down_Fighting_icon_Federation.png",
@@ -789,6 +838,7 @@ qtyLabel:"Health Lost %",
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Quantum Singularity Manipulation (T5)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Quantum_Singularity_Manipulation_icon.png",
@@ -801,6 +851,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Reputation Trait - Quantum Singularity Manipulation (T6)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Quantum_Singularity_Manipulation_icon.png",
@@ -813,6 +864,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Captain Power - Scattering Field",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Scattering_Field_icon_Federation.png",
@@ -825,6 +877,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Captain Power - Tactical Fleet III",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Tactical_Fleet_icon_Federation.png",
@@ -837,6 +890,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Bridge Officer Ability - Attack Pattern Omega I, II",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Attack_Pattern_Omega_icon_Federation.png",
@@ -849,6 +903,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Bridge Officer Ability - Attack Pattern Omega III",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Attack_Pattern_Omega_icon_Federation.png",
@@ -861,6 +916,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Bridge Officer Ability - Emergency Power to Auxiliary",
+active:false,
 mark:3,
 rarity:rarity.COMMON,
 icon:"Emergency_Power_to_Auxiliary_icon_Klingon.png",
@@ -874,6 +930,7 @@ markLabel:"Rank: ",
 unique:false});
 
 equipmentList.push({name:"Bridge Officer Ability - Fly Her Apart",
+active:false,
 mark:3,
 rarity:rarity.COMMON,
 icon:"Fly_Her_Apart_icon_Federation.png",
@@ -888,6 +945,7 @@ qtyLabel:"Seconds",
 unique:false});
 
 equipmentList.push({name:"Bridge Officer Ability - Focused Assault",
+active:false,
 mark:3,
 rarity:rarity.COMMON,
 icon:"Focused_Assault_icon_Klingon.png",
@@ -902,6 +960,7 @@ qtyLabel:"Seconds",
 unique:false});
 
 equipmentList.push({name:"Modifier - Warp Core with [AMP]",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Matter_Anti-Matter_Warp_Core_icon.png",
@@ -915,6 +974,7 @@ qtyLabel:"AMP Stacks",
 unique:true});
 
 equipmentList.push({name:"Bridge Officers - Basic Romulan Operative",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Romulan_Operative_icon.png",
@@ -928,6 +988,7 @@ qtyLabel:"Officers",
 unique:true});
 
 equipmentList.push({name:"Chronometric Energy Converter - Weapon Power",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Chronometric_Energy_Converter_icon.png",
@@ -941,6 +1002,7 @@ qtyLabel:"Weapon Power",
 unique:true});
 
 equipmentList.push({name:"Chronometric Energy Converter - Base Bonus",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Chronometric_Energy_Converter_icon.png",
@@ -953,11 +1015,12 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Modifier - Deflector with [ColCrit]",//special case
+active:false,
 mark:1,
 rarity:rarity.ULTRA_RARE,
 icon:"Elite_Fleet_Intervention_Protomatter_Deflector_Array_icon.png",
 statItem:[stats.CrtH_EXOTIC],
-statType:[statScaling.FIXED],
+statType:["ColCrit"],
 statValue:[0.0004],
 statContribution:[0],
 quantity:100,
@@ -966,6 +1029,7 @@ qtyLabel:"Hull %",
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Delphic Particle Accelerators 2pc",
+active:false,
 mark:1,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Interphase_Quantum_Distributor_icon.png",
@@ -978,6 +1042,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Tholian Technologies 2pc",
+active:false,
 mark:1,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Tholian_Web_Cannon_icon.png",
@@ -990,6 +1055,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Personal Endeavour - Exotic Damage",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Exotic_Personal_Endevour_icon.png",
@@ -1003,6 +1069,7 @@ qtyLabel:"Points",
 unique:true});
 
 equipmentList.push({name:"Battery - Exotic Particle Flood",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Battery_-_Exotic_Particle_Flood_icon.png",
@@ -1015,6 +1082,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Flagship Technologies 2pc",
+active:false,
 mark:1,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Flagship_Tactical_Computer_icon.png",
@@ -1027,6 +1095,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Fleet Combat Buff",
+active:false,
 mark:3,
 rarity:rarity.COMMON,
 icon:"Science_Skill_4_R1.png",
@@ -1040,6 +1109,7 @@ markLabel:"Tier",
 unique:true});
 
 equipmentList.push({name:"Bridge Officers - Pirate Trait",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Pirate_icon.png",
@@ -1053,6 +1123,7 @@ qtyLabel:"Officers",
 unique:true});
 
 equipmentList.push({name:"Bridge Officers - Romulan Operative Trait",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Romulan_Operative_icon.png",
@@ -1066,6 +1137,7 @@ qtyLabel:"Officers",
 unique:true});
 
 equipmentList.push({name:"Bridge Officers - Superior Romulan Operative Trait",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Romulan_Operative_icon.png",
@@ -1079,6 +1151,7 @@ qtyLabel:"Officers",
 unique:true});
 
 equipmentList.push({name:"Prevailing Resilient Shield Array",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Prevailing_Innervated_Resilient_Shield_Array_icon.png",
@@ -1091,6 +1164,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Set Bonus - Protonic Arsenal 2pc",
+active:false,
 mark:1,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Proton_Particle_Stabilizer_icon.png",
@@ -1103,6 +1177,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Protonic Arsenal 3pc",
+active:false,
 mark:1,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Proton_Particle_Stabilizer_icon.png",
@@ -1115,6 +1190,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Radiant Subatomic Pulse 4pc",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Radiant_Subatomic_Pulse_icon_Federation.png",
@@ -1127,6 +1203,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Technician Duty Officer - Exotic Damage on use of Emergency Power to Aux",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Bulkhead_Technician_icon.png",
@@ -1140,6 +1217,7 @@ qtyLabel:"Officers",
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Lorca's Ambition 2pc",
+active:false,
 mark:1,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Tactical_-_Lorcas_Custom_Fire_Controls_icon.png",
@@ -1153,6 +1231,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Active Power - Adaptive Emergency Systems (High Hull HP)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Adaptive_Emergency_Systems_icon_Federation.png",
@@ -1165,6 +1244,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Adaptive Emergency Systems (Low Hull HP)",
+active:false,
 mark:1,
 rarity:rarity.COMMON,
 icon:"Adaptive_Emergency_Systems_icon_Federation.png",
@@ -1177,6 +1257,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Engineering - Conductive RCS Accelerator [EPG]",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Engineering_-_Conductive_RCS_Accelerator_icon.png",
@@ -1189,6 +1270,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [EPG]",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
@@ -1201,6 +1283,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Field Exciter [not-EPG]",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Field_Exciter_icon.png",
@@ -1213,6 +1296,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Particle Generator",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Particle_Generator_icon.png",
@@ -1225,6 +1309,7 @@ maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Shield Refrequencer [EPG]",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Shield_Refrequencer_icon.png",
@@ -1237,6 +1322,7 @@ maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Threat Scaling Console",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Plasma-Generating_Weapon_Signature_Amplifier_icon.png",
@@ -1249,6 +1335,7 @@ maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Primary]",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Focuser_icon.png",
@@ -1261,6 +1348,7 @@ maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Exotic Particle Focuser [EPG Secondary]",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Science_-_Exotic_Particle_Focuser_icon.png",
@@ -1273,6 +1361,7 @@ maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Temporally Shielded Datacore",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Temporally_Shielded_Datacore_icon.png",
@@ -1285,6 +1374,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Tactical - Chronometric Capacitor",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Tactical_-_Chronometric_Capacitor_icon.png",
@@ -1297,6 +1387,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Nukara Particle Converter",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Nukara_Particle_Converter_icon.png",
@@ -1309,6 +1400,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Auxiliary Ejection Assembly",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Auxiliary_Ejection_Assembly_icon.png",
@@ -1321,6 +1413,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Disruption Pulse Emitter",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Disruption_Pulse_Emitter_icon.png",
@@ -1333,6 +1426,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Causal Anchor",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Causal_Anchor_icon.png",
@@ -1345,6 +1439,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Constriction Anchor",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Constriction_Anchor_icon.png",
@@ -1357,6 +1452,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Delphic Tear Generator",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Delphic_Tear_Generator_icon.png",
@@ -1369,6 +1465,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - D.O.M.I.N.O.",
+active:false,
 mark:defaultMark,
 rarity:rarity.COMMON,
 icon:"DOMINO_icon.png",
@@ -1381,6 +1478,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Dynamic Power Redistributor Module",
+active:false,
 mark:defaultMark,
 rarity:rarity.COMMON,
 icon:"Dynamic_Power_Redistributor_icon_Federation.png",
@@ -1393,6 +1491,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Set Bonus - Flagship Technologies 3pc",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Adaptive_Emergency_Systems_icon.png",
@@ -1406,6 +1505,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Isometric Dispersal Array",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Isometric_Dispersal_Array_icon.png",
@@ -1418,6 +1518,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - M6 Computer",
+active:false,
 mark:defaultMark,
 rarity:rarity.COMMON,
 icon:"Advanced_Tactical_Computer_icon_Federation.png",
@@ -1430,6 +1531,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Metaphasic Solar Capacitor",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Metaphasic_Solar_Capacitor_icon.png",
@@ -1442,6 +1544,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Metaphasic Solar Capacitor",
+active:false,
 mark:defaultMark,
 rarity:rarity.COMMON,
 icon:"Activate_Metaphasic_Solar_Capacitor_icon_Federation.png",
@@ -1454,6 +1557,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Active Power - Particle Conversion Matrix",
+active:false,
 mark:defaultMark,
 rarity:rarity.COMMON,
 icon:"Particle_Conversion_Matrix_icon_Federation.png",
@@ -1467,6 +1571,7 @@ qtyLabel:"Stacks",
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Point Defense Bombardment Warhead",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Point_Defense_Bombardment_Warhead_icon.png",
@@ -1479,6 +1584,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Quantum Deceleration Field Generator",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Quantum_Deceleration_Field_Generator_i.png",
@@ -1491,6 +1597,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Radiation Bombardment Matrix",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Radiation_Bombardment_Matrix_icon.png",
@@ -1503,6 +1610,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Resonant Dissipation Matrix",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Resonant_Dissipation_Matrix_icon.png",
@@ -1515,6 +1623,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Sensor Probe Swarm",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Sensor_Probe_Swarm_icon.png",
@@ -1527,6 +1636,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Spatial Sinkhole Generator",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Spatial_Sinkhole_Generator_icon.png",
@@ -1539,6 +1649,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Temporal Distortion Field",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Temporal_Distortion_Field_icon.png",
@@ -1551,6 +1662,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Temporal Rift Stabilizer",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Temporal_Rift_Stabilizer_icon.png",
@@ -1563,6 +1675,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Warp Burst Capacitor",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Warp_Burst_Capacitor_icon.png",
@@ -1575,6 +1688,7 @@ maxQty:1,
 unique:true});
 
 equipmentList.push({name:"Console - Universal - Assimilated Module",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Assimilated_Module_icon.png",
@@ -1587,6 +1701,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Various - Bellum Console",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Nanite-Reinforced_Circuitry_icon.png",
@@ -1599,6 +1714,7 @@ maxQty:12,
 unique:false});
 
 equipmentList.push({name:"Console - Science - Bellum Particle Generator",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Science_-_Particle_Generator_icon.png",
@@ -1611,6 +1727,7 @@ maxQty:6,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Bioneural Infusion Circuits",
+active:false,
 mark:defaultMark,
 rarity:rarity.RARE,
 icon:"Console_-_Bioneural_Infusion_Circuits_icon.png",
@@ -1623,6 +1740,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Interphase Quantum Distributor",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Interphase_Quantum_Distributor_icon.png",
@@ -1635,6 +1753,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Lorca's Custom Fire Controls",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Tactical_-_Lorcas_Custom_Fire_Controls_icon.png",
@@ -1647,6 +1766,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Tachyokinetic Converter",
+active:false,
 mark:defaultMark,
 rarity:rarity.RARE,
 icon:"Console_-_Tachyokinetic_Converter_icon.png",
@@ -1659,6 +1779,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Tactical - Vulnerability Exploiter",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Tactical_-_Vulnerability_Exploiter_icon.png",
@@ -1671,6 +1792,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Tactical - Vulnerability Locator",
+active:false,
 mark:defaultMark,
 rarity:rarity.ULTRA_RARE,
 icon:"Console_-_Tactical_-_Vulnerability_Locator_icon.png",
@@ -1683,6 +1805,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Zero Point Energy Conduit",
+active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Zero_Point_Energy_Conduit_icon.png",
@@ -1695,6 +1818,7 @@ maxQty:1,
 unique:false});
 
 equipmentList.push({name:"Console - Universal - Interphasic Instability",
+active:false,
 mark:defaultMark,
 rarity:rarity.EPIC,
 icon:"Console_-_Universal_-_Interphasic_Instability_icon.png",
@@ -1919,108 +2043,65 @@ baseCat1:1.8863,
 damageType:"Kinetic"});
 
 //MATHS----------------------------------------------------------------------------------------------
-//This function will flip the color of the card. If the card is black, it will flip to color, otherwise it will flip to black.
 function flipColor(cardID) {
-	var backString = cardID.style.background; //gets the current card background
-	backString = backString.slice(4, backString.indexOf(")")); //slices down to just the color, probably a better way to do this
-	var seld; //seld is used as a multiplier to add or remove stats
-	if (backString == "0, 0, 0") {
-		cardID.style.background = '#222288'; //change this HEX value in order to change the color of the selected card
-		seld = 1; //seld of 1 means the stats will be added to the total
-	}
-	else {
-		cardID.style.background = '#000000'; //change this HEX value in order to change the color of the deselected card, but it's also used in the IF
-		seld = -1; //seld of -1 means the stats will be removed from the total
-	}
-	for (var x = 0; x < equipmentList.length; x++) {//These are the special cases for some of the powers that scale off inputs
-		if(cardID.innerHTML.indexOf(equipmentList[x].name) > -1) {
-			if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == 1) {
-			PART_MANIP_IS_ACTIVE_OVERLORD = true;
-			}
-			else if(cardID.innerHTML.indexOf("Particle Manipulator")> -1 && seld == -1) {
-			PART_MANIP_IS_ACTIVE_OVERLORD = false;
-			}
-			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T5)")> -1 && seld == 1) {
-			AUX_POWER_CONFIG_IS_ACTIVE = true;
-			}
-			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T5)")> -1 && seld == -1) {
-			AUX_POWER_CONFIG_IS_ACTIVE = false;
-			}
-			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T6)")> -1 && seld == 1) {
-			T6_AUX_POWER_CONFIG_IS_ACTIVE = true;
-			}
-			else if(cardID.innerHTML.indexOf("Power Configuration - Offense (T6)")> -1 && seld == -1) {
-			T6_AUX_POWER_CONFIG_IS_ACTIVE = false;
-			}
-			else if(cardID.innerHTML.indexOf("ColCrit")> -1 && seld == 1) {
-			COLCRIT_ACTIVE = true;
-			COLCRIT_HULL = equipmentList[x].quantity;
-			}
-			else if(cardID.innerHTML.indexOf("ColCrit")> -1 && seld == -1) {
-			COLCRIT_ACTIVE = false;
-			COLCRIT_HULL = equipmentList[x].quantity;
-			}
-			sumStats(x,seld);//Take the power and add it into the main stats
-		}
-	}
-	updateTotals();//Updates the values shown at the top
+var powerID = cardID.id.replace("cardNo","");//Get the equipment ID number
+equipmentList[powerID].active = !equipmentList[powerID].active;
+if (equipmentList[powerID].active) {
+cardID.style.background = '#222288';
 }
-//This is the function that scales the rarity up and down
-function rarClick(cardID,event) {
-	event.stopPropagation();//Prevents the buttons on the card from flipping the card color
-var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
-var rarityUP = (cardID.value == "Upgrade Rarity");//If the button pushed is "Upgrade", true, otherwise, false ("downgrade")
-var rarityCurrent;//variable for the current rarity
-var rarityNew;//variable for the new rarity
-var backString = mainCard.style.background;//get the card background
-backString = backString.slice(4, backString.indexOf(")"));
-	if (backString != "0, 0, 0") {//if the card is turned on, turn it off before upgrading
-		flipColor(mainCard);
-	}
-	for (var x = 0; x < equipmentList.length; x++) {//loop through all the equipment
-		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {//figure out which card we are looking at
-			rarityCurrent = equipmentList[x].rarity;//Get the current rarity from the list
-		if (rarityUP) {//If you want to upgrade the rarity...
-			rarityNew = Math.min(rarityCurrent + 1, 6);//Max out at 6, which is currently the highest rarity
-		}
-		else if (!rarityUP) {//And if you want to downgrade...
-			rarityNew = Math.max(rarityCurrent - 1, 1);//Min out at 1, which is the lowest rarity
-		}
-		else {
-			alert("There is an error with rarity selection");//It's a boolean, so we should never see this case
-		}
-		equipmentList[x].rarity = rarityNew;//Change the item in the array to the new rarity
-		mainCard.children[0].children[1].src = mainCard.children[0].children[1].src.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);//Change the rarity icon to the new rarity icon
-		}
-	}
-	if (backString != "0, 0, 0") {//if the card was turned on before, turn it back on, otherwise leave it alone
-		flipColor(mainCard);
-	}
+else {
+cardID.style.background = '#000000';
+}
+updateTotals();
 }
 //This will set the AUX power from the input at the top of the website, this will persist even if all of the consoles have +power because of power setting
 function setAux(cardID,event) {
 totalStats[stats.AUX_POWER] = cardID.value;
 updateTotals();
 }
+//This is the function that scales the rarity up and down
+function rarClick(cardID,event) {
+	event.stopPropagation();//Prevents the buttons on the card from flipping the card color
+var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
+var powerID = mainCard.id.replace("cardNo","");//Get the equipment ID number
+var disengage = equipmentList[powerID].active;//If the equipment is active, it will be deactivated before continuing
+var rarityUP = (cardID.value == "Upgrade Rarity");//If the button pushed is "Upgrade", true, otherwise, false ("downgrade")
+var rarityCurrent;//variable for the current rarity
+var rarityNew;//variable for the new rarity
+	if (disengage) {//if the card is turned on, turn it off before upgrading
+		flipColor(mainCard);
+	}
+	rarityCurrent = equipmentList[powerID].rarity;//Get the current rarity from the list
+	if (rarityUP) {//If you want to upgrade the rarity...
+		rarityNew = Math.min(rarityCurrent + 1, 6);//Max out at 6, which is currently the highest rarity
+	}
+	else if (!rarityUP) {//And if you want to downgrade...
+		rarityNew = Math.max(rarityCurrent - 1, 1);//Min out at 1, which is the lowest rarity
+	}
+	else {
+		alert("There is an error with rarity selection");//It's a boolean, so we should never see this case
+	}
+	equipmentList[powerID].rarity = rarityNew;//Change the item in the array to the new rarity
+	mainCard.children[0].children[1].src = mainCard.children[0].children[1].src.replace(rarityIcons[rarityCurrent-1], rarityIcons[rarityNew-1]);//Change the rarity icon to the new rarity icon
+	if (disengage) {//if the card was turned on before, turn it back on, otherwise leave it alone
+		flipColor(mainCard);
+	}
+}
 //This function upgrades or downgrades the rarity
 function upgClickSpin(cardID,event) {
 	event.stopPropagation();//Prevents the buttons on the card from flipping the card color
 var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
 var markCurrent;//Variable for the current mark
+var powerID = mainCard.id.replace("cardNo","");//Get the equipment ID number
+var disengage = equipmentList[powerID].active;//If the equipment is active, it will be deactivated before continuing
 var markNew = cardID.value;//This is the value from the number input, which is to set the new mark
-var backString = mainCard.style.background;//get the card background (I really am starting to think this could be applied to the equipment instead of the card...)
-backString = backString.slice(4, backString.indexOf(")"));
-	if (backString != "0, 0, 0") {//if the card is turned on, turn it off before upgrading
+	if (disengage) {//if the card is turned on, turn it off before upgrading
 		flipColor(mainCard);
 	}
-	for (var x = 0; x < equipmentList.length; x++) {//loop through all the equipment
-		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {//figure out which card we are looking at
-			markCurrent = equipmentList[x].mark;//Get the current mark from the list
-			equipmentList[x].mark = Number(markNew);//Set the mark back into the equipment list
-			mainCard.children[0].children[2].src = mainCard.children[0].children[2].src.replace(ROMAN[markCurrent], ROMAN[markNew]);//Change the icon for the mark to the new mark
-		}
-	}
-	if (backString != "0, 0, 0") {//if the card was turned on before, turn it back on, otherwise leave it alone
+	markCurrent = equipmentList[powerID].mark;//Get the current mark from the list
+	equipmentList[powerID].mark = Number(markNew);//Set the mark back into the equipment list
+	mainCard.children[0].children[2].src = mainCard.children[0].children[2].src.replace(ROMAN[markCurrent], ROMAN[markNew]);//Change the icon for the mark to the new mark
+	if (disengage) {//if the card was turned on before, turn it back on, otherwise leave it alone
 		flipColor(mainCard);
 	}
 }
@@ -2030,56 +2111,18 @@ function qtyClickSpin(cardID,event) {
 var mainCard = cardID.parentNode.parentNode.parentNode;//Go up the tree to get the ID of the full card, not just the button
 var qtyCurrent;//Variable to store the current quantity
 var qtyNew = cardID.value;//This is the value from the number input, which is to set the new quantity
-var backString = mainCard.style.background;//get the card background 
-backString = backString.slice(4, backString.indexOf(")"));
-	if (backString != "0, 0, 0") {//if the card is turned on, turn it off before upgrading
+var powerID = mainCard.id.replace("cardNo","");//Get the equipment ID number
+var disengage = equipmentList[powerID].active;//If the equipment is active, it will be deactivated before continuing
+	if (disengage) {//if the card is turned on, turn it off before upgrading
 		flipColor(mainCard);
 	}
-	for (var x = 0; x < equipmentList.length; x++) {//loop through all the equipment
-		if(mainCard.innerHTML.indexOf(equipmentList[x].name) > -1) {//figure out which card we are looking at
-			qtyCurrent = equipmentList[x].quantity;//Get the current quantity from the list
-			equipmentList[x].quantity = Number(qtyNew);//Set the new quantity to the list
-		}
-	}
-	if (backString != "0, 0, 0") {//if the card was turned on before, turn it back on, otherwise leave it alone
+	qtyCurrent = equipmentList[powerID].quantity;//Get the current quantity from the list
+	equipmentList[powerID].quantity = Number(qtyNew);//Set the new quantity to the list
+	if (disengage) {//if the card was turned on before, turn it back on, otherwise leave it alone
 		flipColor(mainCard);
 	}
 }
-//This function adds or removes the stat contributions from each item
-function sumStats(itemNum,seld) {
-	for (var x = 0; x < Object.keys(stats).length; x++) {//loop through as many stats as there are
-		if (equipmentList[itemNum].statValue[x] != undefined) {//If there is a stat contribution, add it here
-			equipmentList[itemNum].statContribution[x] = 0;//set the stat contribution to 0
-			switch(equipmentList[itemNum].statType[x]) {//Figure out how the stat scales
-				case statScaling.MARK_AND_RARITY://Mark and rarity will take QTY * STAT * (Mk + Rarity)
-				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
-				break;
-				case statScaling.MARK_ONLY://Mark only will take QTY * STAT * (1+ Rarity) in most cases, new cases needed if this isn't the case
-				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x] * (1 + equipmentList[itemNum].mark);
-				break;
-				case statScaling.FIXED://FIXED Doesn't care about mark or rarity. Even some things that can be upgraded will have fixed stats
-				equipmentList[itemNum].statContribution[x] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[x];
-				break;
-				default://If it isn't one of these types of issues, then we need to throw an error
-				console.log("There's a problem summing stats for " + equipmentList[itemNum].name + " " +x);
-			}
-			totalStats[equipmentList[itemNum].statItem[x]] += seld * equipmentList[itemNum].statContribution[x];//Add or remove the stat from the totals
-			equipmentList[itemNum].statContribution[x] = Math.round(equipmentList[itemNum].statContribution[x]*100)/100//Update the contribution value on the card
-			if (seld == 1) {//If we are turning on the power, add it to the restore string
-			restorePoint += itemNum + "|";
-			}
-			else if (seld == -1) {//if we are removing the power, then we need to pull it out of the restore string wherever it might be
-			restorePoint = restorePoint.replace(itemNum + "|", "");
-			}
-			if (x == 0) {//Update the contribution string for the card. For the first item, its "+BLAH"
-				document.getElementById("contrib" + itemNum).innerHTML = '+' + equipmentList[itemNum].statContribution[x] + ' ' + statsFriendly[equipmentList[itemNum].statItem[x]];
-			}
-			else {//For 1+n items, its ", BLAH"
-				document.getElementById("contrib" + itemNum).innerHTML += ', ' + equipmentList[itemNum].statContribution[x] + ' ' + statsFriendly[equipmentList[itemNum].statItem[x]];
-			}
-		}
-	}
-}
+
 //Function that can push things to the clipboard
 function copyStringToClipboard (str) {
    // Create new element
@@ -2116,19 +2159,22 @@ function restoreItemsFn() {
 	var searchText = document.getElementById("restorePointIn").value;//Get the search string (only on the Restore button press)
 	var cardELEMENT = document.getElementsByClassName('card');//Get all of the cards
 	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
-		var backString = cardELEMENT[x].style.background;//Get the background (again)
-		backString = backString.slice(4, backString.indexOf(")"));
 		if (searchText.indexOf("|" + x + "|") > -1) {//If the ID of the card is in the restore string, go ahead and do this
-			if (backString == "0, 0, 0" ) {//If the card is off, turn it on
+			if (!equipmentList[x].active) {//If the card is off, turn it on
 				flipColor(cardELEMENT[x]);
 			}
 		}
 		else {//If the ID isn't in the restore string, then we need to turn it off
-			if (backString != "0, 0, 0" ) {
+			if (equipmentList[x].active) {
 				flipColor(cardELEMENT[x]);
 			}
 		}
 	}
+}
+//clears the search box
+function clearSearchFn() {
+document.getElementById("searchItems").value = ""
+searchItemsFn();
 }
 //Clears the restore input box
 function clearRestoreFn() {
@@ -2158,7 +2204,7 @@ totalStats[stats.AUX_POWER] = 100;//Reset the AUX to 100
 var lenEq = equipmentList.length;//Get the number of equipments
 
 var baseMessageItem = '<div class="row">'+//This is the base HTML for a card, but has fillers based on what is chosen or not
-'<div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);">'+
+'<div class="card" onClick="flipColor(this)" style="background: rgb(0, 0, 0);" id=CARD_ID>'+
 	'<div class="imageWrapper">'+
 		'<img class="overlayImage" src="img/ITEM_ICON" alt="Icon">'+
 		'<img class="overlayImage" src="img/RARITY_ICON" alt="Rarity" id="rarity_icon">'+
@@ -2206,6 +2252,7 @@ for (var x = 0; x < lenEq; x++) {//Loop through all of the items
 	messageData = messageData.replace("BLURB", equipmentList[x].name);
 	messageData = messageData.replace("MARK_ICON", ROMAN[equipmentList[x].mark]);
 	messageData = messageData.replace("CONTRIBUTIONS", '<span id="contrib'+x+'" style="float:right; margin-right: 10px;color: #998877;">+0</span>');
+	messageData = messageData.replace("CARD_ID", 'cardNo' + x);
 	var qtyNote= "Quantity";
 	if (equipmentList[x].qtyLabel != undefined) {
 		qtyNote = equipmentList[x].qtyLabel;
@@ -2250,43 +2297,80 @@ for (var x = 0; x < lenPw; x++) {
 document.getElementById('items').innerHTML += '<div class="column">' + messageDataX + '</div>';
 updateTotals();
 }
-
-//This function updates the totals by summing up each contribution and a lot of special cases
-function updateTotals() {
-//Particle Manip handling
-var PM_CrtH = Math.min(totalStats[stats.EPG]*0.002,0.5)*PART_MANIP_IS_ACTIVE_OVERLORD;
-var PM_CrtD = totalStats[stats.EPG]*0.001*PART_MANIP_IS_ACTIVE_OVERLORD;
-
-//Aux Power Config handling
-var APC_Cat2 = totalStats[stats.AUX_POWER]*0.0005*AUX_POWER_CONFIG_IS_ACTIVE + 
-totalStats[stats.AUX_POWER]*0.0005*T6_AUX_POWER_CONFIG_IS_ACTIVE*1.25;
-
-//ColCrit Handling
-var CC_CrtD = COLCRIT_ACTIVE*Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05);
-	for (var x = 0; x < equipmentList.length; x++) {
-		if (equipmentList[x].name == "Personal Trait - Particle Manipulator") {
-			equipmentList[x].statContribution[0] = Math.round(Math.min(totalStats[stats.EPG]*0.002,0.5)*100)/100;
-			equipmentList[x].statContribution[1] = Math.round(totalStats[stats.EPG]*0.001*100)/100;
-			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]] + ', ' + equipmentList[x].statContribution[1] + ' ' + statsFriendly[equipmentList[x].statItem[1]];
-		}
-		else if (equipmentList[x].name == "Reputation Trait - Auxiliary Power Configuration - Offense (T5)") {
-			equipmentList[x].statContribution[0] = Math.round(totalStats[stats.AUX_POWER]*0.0005*100)/100;
-			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
-		}
-		else if (equipmentList[x].name == "Reputation Trait - Auxiliary Power Configuration - Offense (T6)") {
-			equipmentList[x].statContribution[0] = Math.round(totalStats[stats.AUX_POWER]*0.0005*1.25*100)/100;
-			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
-		}
-		else if (equipmentList[x].name == "Modifier - Deflector with [ColCrit]") {
-			equipmentList[x].statContribution[0] = Math.round(Math.max(0.05,(COLCRIT_HULL-(100/3))*0.0015+0.05)*100)/100;
-			document.getElementById("contrib" + x).innerHTML = '+' + equipmentList[x].statContribution[0] + ' ' + statsFriendly[equipmentList[x].statItem[0]];
+//This function adds or removes the stat contributions from each item
+function sumStats(itemNum,seld) {
+	for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {//loop through as many stats as there are
+		if (equipmentList[itemNum].statValue[statsLoop] != undefined) {//If there is a stat contribution, add it here
+			equipmentList[itemNum].statContribution[statsLoop] = 0;//set the stat contribution to 0
+			switch(equipmentList[itemNum].statType[statsLoop]) {//Figure out how the stat scales
+				case statScaling.MARK_AND_RARITY://Mark and rarity will take QTY * STAT * (Mk + Rarity)
+				equipmentList[itemNum].statContribution[statsLoop] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[statsLoop] * (equipmentList[itemNum].rarity + equipmentList[itemNum].mark);
+				break;
+				case statScaling.MARK_ONLY://Mark only will take QTY * STAT * (1+ Rarity) in most cases, new cases needed if this isn't the case
+				equipmentList[itemNum].statContribution[statsLoop] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[statsLoop] * (1 + equipmentList[itemNum].mark);
+				break;
+				case statScaling.FIXED://FIXED Doesn't care about mark or rarity. Even some things that can be upgraded will have fixed stats
+				equipmentList[itemNum].statContribution[statsLoop] = equipmentList[itemNum].quantity * equipmentList[itemNum].statValue[statsLoop];
+				break;
+				case "PM CrtH":
+				equipmentList[itemNum].statContribution[statsLoop] = preTotalStats[stats.EPG]*0.001;
+				break;
+				case "PM CrtD":
+				equipmentList[itemNum].statContribution[statsLoop] = Math.min(preTotalStats[stats.EPG]*0.002,0.5);
+				break;
+				case "APC5":
+				equipmentList[itemNum].statContribution[statsLoop] = Math.round(preTotalStats[stats.AUX_POWER]*0.0005*100)/100;
+				break;
+				case "APC6":
+				equipmentList[itemNum].statContribution[statsLoop] = Math.round(preTotalStats[stats.AUX_POWER]*0.0005*1.25*100)/100;
+				break;
+				case "ColCrit":
+				equipmentList[itemNum].statContribution[statsLoop] = Math.round(Math.max(0.05,(equipmentList[itemNum].quantity-(100/3))*0.0015+0.05)*100)/100;
+				break;
+				default://If it isn't one of these types of issues, then we need to throw an error
+				console.log("There's a problem summing stats for " + equipmentList[itemNum].name + " " +statsLoop);
+			}
+			totalStats[equipmentList[itemNum].statItem[statsLoop]] += equipmentList[itemNum].statContribution[statsLoop] * seld;
+			equipmentList[itemNum].statContribution[statsLoop] = Math.round(equipmentList[itemNum].statContribution[statsLoop]*100)/100;//Update the contribution value on the card
 		}
 	}
+}
+//This function updates the totals by summing up each contribution
+function updateTotals() {
+for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {//clear the totals for both primary and secondary totals
+totalStats[statsLoop] = 0;//this is the first pass at totals
+preTotalStats[statsLoop] = 0;//this is the storage of the first pass at totals, for powers that derive their strength based on totals
+}
+restorePoint = "|"
+for (var itemNum = 0; itemNum < equipmentList.length; itemNum++) {
+sumStats(itemNum,equipmentList[itemNum].active);//This updates the stats for each power
+if (equipmentList[itemNum].active) {
+	restorePoint += itemNum + '|';
+}
+}
+for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {
+preTotalStats[statsLoop] = totalStats[statsLoop];
+totalStats[statsLoop] = 0;
+}
+for (var itemNum = 0; itemNum < equipmentList.length; itemNum++) {
+	sumStats(itemNum,equipmentList[itemNum].active);
+	for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {//loop through as many stats as there are
+		if (equipmentList[itemNum].statValue[statsLoop] != undefined) {
+			if (statsLoop == 0) {//Update the contribution string for the card. For the first item, its "+BLAH"
+				document.getElementById("contrib" + itemNum).innerHTML = '+' + equipmentList[itemNum].statContribution[statsLoop] + ' ' + statsFriendly[equipmentList[itemNum].statItem[statsLoop]];
+			}
+			else {//For 1+n items, its ", BLAH"
+				document.getElementById("contrib" + itemNum).innerHTML += ', ' + equipmentList[itemNum].statContribution[statsLoop] + ' ' + statsFriendly[equipmentList[itemNum].statItem[statsLoop]];
+			}
+		}
+	}
+}
+	
 document.getElementById('EPG').innerHTML = Math.round(totalStats[stats.EPG]*1000)/1000;
 document.getElementById('Cat1').innerHTML = Math.round(totalStats[stats.Cat1_EXOTIC]*1000)/1000;
-document.getElementById('Cat2').innerHTML = Math.round((totalStats[stats.Cat2_EXOTIC]+APC_Cat2)*1000)/1000;
-document.getElementById('CrtH').innerHTML = Math.round((totalStats[stats.CrtH_EXOTIC]+PM_CrtH)*1000)/1000;
-document.getElementById('CrtD').innerHTML = Math.round((totalStats[stats.CrtD_EXOTIC]+PM_CrtD+CC_CrtD)*1000)/1000;
+document.getElementById('Cat2').innerHTML = Math.round((totalStats[stats.Cat2_EXOTIC])*1000)/1000;
+document.getElementById('CrtH').innerHTML = Math.round((totalStats[stats.CrtH_EXOTIC])*1000)/1000;
+document.getElementById('CrtD').innerHTML = Math.round((totalStats[stats.CrtD_EXOTIC])*1000)/1000;
 //document.getElementById('AUXMAX').innerHTML = Math.round(totalStats[stats.MAX_AUX_POWER]*1000)/1000;
 var powerText = [null];
 //This sums up the power tooltip values, based on the different types of equations
