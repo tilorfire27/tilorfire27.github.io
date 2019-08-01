@@ -2158,16 +2158,38 @@ function searchItemsFn() {
 function restoreItemsFn() {
 	var searchText = document.getElementById("restorePointIn").value;//Get the search string (only on the Restore button press)
 	var cardELEMENT = document.getElementsByClassName('card');//Get all of the cards
-	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
-		if (searchText.indexOf("|" + x + "|") > -1) {//If the ID of the card is in the restore string, go ahead and do this
-			if (!equipmentList[x].active) {//If the card is off, turn it on
-				flipColor(cardELEMENT[x]);
+	searchText = searchText.split("|");
+	for (var itemNum = 0; itemNum < equipmentList.length; itemNum++) {
+		if (equipmentList[itemNum].active) {
+			flipColor(cardELEMENT[itemNum]);
+		}
+	}
+	for (var restoreItem = 1; restoreItem < searchText.length-1; restoreItem++) {
+		var restoreElement = searchText[restoreItem].split(".");
+		var itemNum = restoreElement[0];
+		if (restoreElement.length > 1) {
+			for (var restorePiece = 1; restorePiece < restoreElement.length; restorePiece++) {
+				var itemElement = restoreElement[restorePiece];
+				if (itemElement.indexOf("q") > -1 && equipmentList[itemNum].maxQty > 1) {
+					equipmentList[itemNum].quantity = Number(itemElement.replace("q",""));
+					document.getElementById("quantityNumber" + itemNum).value = equipmentList[itemNum].quantity;
+				}
+				else if (itemElement.indexOf("m") > -1 && !equipmentList[itemNum].unique) {
+					var markCurrent = equipmentList[itemNum].mark;
+					equipmentList[itemNum].mark = Number(itemElement.replace("m",""));
+					cardELEMENT[itemNum].children[0].children[2].src = cardELEMENT[itemNum].children[0].children[2].src.replace(ROMAN[markCurrent], ROMAN[equipmentList[itemNum].mark]);//Change the icon for the mark to the new mark
+					document.getElementById("markNumber" + itemNum).value = equipmentList[itemNum].mark;
+				}
+				else if (itemElement.indexOf("r") > -1 && !equipmentList[itemNum].unique) {
+					var rarityCurrent = equipmentList[itemNum].rarity;
+					equipmentList[itemNum].rarity = Number(itemElement.replace("r",""));
+					cardELEMENT[itemNum].children[0].children[1].src = cardELEMENT[itemNum].children[0].children[1].src.replace(rarityIcons[rarityCurrent-1], rarityIcons[equipmentList[itemNum].rarity-1]);//Change the rarity icon to the new rarity icon
+				}
 			}
 		}
-		else {//If the ID isn't in the restore string, then we need to turn it off
-			if (equipmentList[x].active) {
-				flipColor(cardELEMENT[x]);
-			}
+		sumStats(itemNum,0);
+		if (!equipmentList[itemNum].active) {
+			flipColor(cardELEMENT[itemNum]);
 		}
 	}
 }
@@ -2244,7 +2266,7 @@ for (var x = 0; x < lenEq; x++) {//Loop through all of the items
 			messageData = messageData.replace('RARITY_BUTTONS', '<input type="button" value="Upgrade Rarity" onClick="rarClick(this,event)">'+
 			'<input type="button" value="Downgrade Rarity" onClick="rarClick(this,event)">');
 		}
-	messageData = messageData.replace('SCALING_NOTE', '<br>' + markNote + ' <input type="number" value="'+ equipmentList[x].mark +'" min="1" max="'+equipmentList[x].mark+'" onclick="upgClickSpin(this,event)" onkeyup="upgClickSpin(this,event)" id="number" required>');
+	messageData = messageData.replace('SCALING_NOTE', '<br>' + markNote + ' <input type="number" value="'+ equipmentList[x].mark +'" min="1" max="'+equipmentList[x].mark+'" onclick="upgClickSpin(this,event)" onkeyup="upgClickSpin(this,event)" id="markNumber'+x+'" style="width:3em" required>');
 	messageData = messageData.replace('MK_INSTANCE', '<img class="overlayImage" src="img/MkMARK_ICONicon.png" alt="Mark" id="mk_icon">');
 	}
 
@@ -2259,7 +2281,7 @@ for (var x = 0; x < lenEq; x++) {//Loop through all of the items
 	}
 	
 	if (equipmentList[x].maxQty != 1) {
-	messageData = messageData.replace('QTY_NOTE', '<br>'+ qtyNote +': <input type="number" value="'+equipmentList[x].quantity+'" min="1" max="'+ equipmentList[x].maxQty +'" onclick="qtyClickSpin(this,event)" onkeyup="qtyClickSpin(this,event)" id="number" required>');
+	messageData = messageData.replace('QTY_NOTE', '<br>'+ qtyNote +': <input type="number" value="'+equipmentList[x].quantity+'" min="1" max="'+ equipmentList[x].maxQty +'" onclick="qtyClickSpin(this,event)" onkeyup="qtyClickSpin(this,event)" id="quantityNumber'+x+'" style="width:3em" required>');
 	}
 	else {
 	messageData = messageData.replace('QTY_NOTE', '');
@@ -2343,10 +2365,18 @@ preTotalStats[statsLoop] = 0;//this is the storage of the first pass at totals, 
 }
 restorePoint = "|"
 for (var itemNum = 0; itemNum < equipmentList.length; itemNum++) {
-sumStats(itemNum,equipmentList[itemNum].active);//This updates the stats for each power
-if (equipmentList[itemNum].active) {
-	restorePoint += itemNum + '|';
-}
+	sumStats(itemNum,equipmentList[itemNum].active);//This updates the stats for each power
+	if (equipmentList[itemNum].active) {
+		restorePoint += itemNum;
+		if (equipmentList[itemNum].quantity > 1) {
+			restorePoint += ".q" + equipmentList[itemNum].quantity;
+		}
+		if (!equipmentList[itemNum].unique) {
+			restorePoint += ".m" + equipmentList[itemNum].mark +
+			".r" + equipmentList[itemNum].rarity;
+		}
+		restorePoint += "|";
+	}
 }
 for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {
 preTotalStats[statsLoop] = totalStats[statsLoop];
