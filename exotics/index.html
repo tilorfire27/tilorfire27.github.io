@@ -1744,7 +1744,7 @@ active:false,
 mark:defaultMark,
 rarity:rarity.VERY_RARE,
 icon:"Console_-_Universal_-_Interphase_Quantum_Distributor_icon.png",
-statItem:[stats.Cat2_EXOTIC],
+statItem:[stats.Cat1_EXOTIC],
 statType:[statScaling.MARK_AND_RARITY],
 statValue:[0.0094],
 statContribution:[0],
@@ -2363,6 +2363,7 @@ for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {//c
 totalStats[statsLoop] = 0;//this is the first pass at totals
 preTotalStats[statsLoop] = 0;//this is the storage of the first pass at totals, for powers that derive their strength based on totals
 }
+totalStats[stats.AUX_POWER] = document.getElementById('AUX_NUM').value;
 restorePoint = "|"
 for (var itemNum = 0; itemNum < equipmentList.length; itemNum++) {
 	sumStats(itemNum,equipmentList[itemNum].active);//This updates the stats for each power
@@ -2382,6 +2383,7 @@ for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {
 preTotalStats[statsLoop] = totalStats[statsLoop];
 totalStats[statsLoop] = 0;
 }
+totalStats[stats.AUX_POWER] = document.getElementById('AUX_NUM').value;
 for (var itemNum = 0; itemNum < equipmentList.length; itemNum++) {
 	sumStats(itemNum,equipmentList[itemNum].active);
 	for (var statsLoop = 0; statsLoop < Object.keys(stats).length; statsLoop++) {//loop through as many stats as there are
