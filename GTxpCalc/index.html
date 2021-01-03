@@ -27,7 +27,7 @@ var XPNeeded = 350 * (Number(TargetLevelVAR * TargetLevelVAR) + Number(TargetLev
 if (TargetLevelVAR > 100 && CurrentLevelVAR > 100) {
 XPNeeded = 437.5 * (Number(TargetLevelVAR * TargetLevelVAR)) - 17062.5 * (Number(TargetLevelVAR)) - 437.5 * (Number(CurrentLevelVAR * CurrentLevelVAR)) + 17062.5 * (Number(CurrentLevelVAR));
 } else if (TargetLevelVAR > 100 && CurrentLevelVAR <= 100) {
-XPNeeded = 437.5 * (Number(TargetLevelVAR * TargetLevelVAR)) - 17062.5 * (Number(TargetLevelVAR)) - 350 * (Number(CurrentLevelVAR * CurrentLevelVAR)) + 350 * (Number(CurrentLevelVAR));
+XPNeeded = 437.5 * (Number(TargetLevelVAR * TargetLevelVAR)) - 17062.5 * (Number(TargetLevelVAR)) + 866250 - 350 * (Number(CurrentLevelVAR * CurrentLevelVAR)) + 350 * (Number(CurrentLevelVAR));
 } 
 if (Number(TargetLevelVAR) < Number(CurrentLevelVAR)) {
 XPNeeded = "You did something silly"
