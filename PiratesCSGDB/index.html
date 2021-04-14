@@ -792,7 +792,11 @@ cardID.style.background = '#000000';
 updateTotals();
 }
 
-
+//clears the search box
+function clearSearchFn() {
+document.getElementById("searchItems").value = ""
+searchItemsFn();
+}
 
 //Search function that hides everything that doesn't match the search
 function searchItemsFn() {
