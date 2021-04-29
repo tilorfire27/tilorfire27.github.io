@@ -334,6 +334,7 @@ text-align: center;
 <title>Tilor's Pirates Database</title>
 </head>
 <h2>Pirates Database</h2>
+<body onload="directLink()">
 <p>
 Check out <a href="https://www.instagram.com/meepleswoodworking/">@meepleswoodworking</a> on Instagram for more info about the creator. <br>
 Big thanks to <a href="https://pirateswithben.com/">pirateswithben.com</a> for much of this information. <br>
@@ -2393,15 +2394,30 @@ function searchItemsFn() {
 	}//Obviously an empty search string matches everything
 }
 
-//Compare used for the sorting of the lists
-function compare(a,b) {
-	if (a.name < b.name) {
-		return -1;
-	}
-	if (a.name > b.name) {
-		return 1;
-	}
-	return 0;
+function filterFaction() {
+	var searchText = document.getElementById("factionItems").value;//Get the search string
+	var cardELEMENT = document.getElementsByClassName('row');//Get all of the cards
+	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
+			cardELEMENT[x].hidden = false;//Hide the card
+		}
+		else {//Otherwise...
+			cardELEMENT[x].hidden = true;//show the card
+		}
+	}//Obviously an empty search string matches everything
+}
+function directLink() {
+var infoBucket=window.location.search.split('=');
+//document.getElementById("searchItems").value = infoBucket[1];
+var cardELEMENT = document.getElementsByClassName('row');//Get all of the cards
+	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(infoBucket[1].toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
+			cardELEMENT[x].hidden = false;//Hide the card
+		}
+		else {//Otherwise...
+			cardELEMENT[x].hidden = true;//show the card
+		}
+	}//Obviously an empty search string matches everything
 }
 </script>
 </body>
