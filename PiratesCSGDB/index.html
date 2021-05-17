@@ -338,6 +338,8 @@ text-align: center;
 <p>
 Check out <a href="https://www.instagram.com/meepleswoodworking/">@meepleswoodworking</a> on Instagram for more info about the creator. <br>
 Big thanks to <a href="https://pirateswithben.com/">pirateswithben.com</a> for much of this information. <br>
+If you want to link a search to someone else, just add "?s=" and the text you want to search.<br>
+Example: https://tilorfire27.github.io/PiratesCSGDB/index.html<b>?s=DJC-001</b><br>
 <label for="searchItems">Search: </label>
 <input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
 <input type="button" value="Clear" onclick="clearSearchFn()"><br>
@@ -2408,10 +2410,11 @@ function filterFaction() {
 }
 function directLink() {
 var infoBucket=window.location.search.split('=');
-//document.getElementById("searchItems").value = infoBucket[1];
+var searchBucket = infoBucket[1].replace("%20"," ");
+document.getElementById("searchItems").value = searchBucket;
 var cardELEMENT = document.getElementsByClassName('row');//Get all of the cards
 	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
-		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(infoBucket[1].toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchBucket.toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
 			cardELEMENT[x].hidden = false;//Hide the card
 		}
 		else {//Otherwise...
