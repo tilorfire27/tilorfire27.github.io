@@ -343,6 +343,20 @@ Example: https://tilorfire27.github.io/PiratesCSGDB/index.html<b>?s=DJC-001</b><
 <label for="searchItems">Search: </label>
 <input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
 <input type="button" value="Clear" onclick="clearSearchFn()"> <input type="button" value="Share" onclick="getShareFn()"><br>
+Shareable link: <a id="sharey" href="https://tilorfire27.github.io/PiratesCSGDB/index.html?s=BC-088">https://tilorfire27.github.io/PiratesCSGDB/index.html?s=BC-088</a><br>
+Faction: <br>
+<img class="iconImg" src="img/American.webp" alt="American"><input type="checkbox" id="AmericanCB" onclick="factionFilterFN(this,event)" checked="true">American<br>
+<img class="iconImg" src="img/Barbary Corsair.webp" alt="Barbary Corsair"><input type="checkbox" id="Barbary CorsairCB" onclick="factionFilterFN(this,event)" checked="true">Barbary Corsair<br>
+<img class="iconImg" src="img/Cursed.webp" alt="Cursed"><input type="checkbox" id="CursedCB" onclick="factionFilterFN(this,event)" checked="true">Cursed<br>
+<img class="iconImg" src="img/English.webp" alt="English"><input type="checkbox" id="EnglishCB" onclick="factionFilterFN(this,event)" checked="true">English<br>
+<img class="iconImg" src="img/French.webp" alt="French"><input type="checkbox" id="FrenchCB" onclick="factionFilterFN(this,event)" checked="true">French<br>
+<img class="iconImg" src="img/Jade Rebellion.webp" alt="Jade Rebellion"><input type="checkbox" id="Jade RebellionCB" onclick="factionFilterFN(this,event)" checked="true">Jade Rebellion<br>
+<img class="iconImg" src="img/Mercenary.webp" alt="Mercenary"><input type="checkbox" id="MercenaryCB" onclick="factionFilterFN(this,event)" checked="true">Mercenary<br>
+<img class="iconImg" src="img/Pirate.webp" alt="Pirate"><input type="checkbox" id="PirateCB" onclick="factionFilterFN(this,event)" checked="true">Pirate<br>
+<img class="iconImg" src="img/Spanish.webp" alt="Spanish"><input type="checkbox" id="SpanishCB" onclick="factionFilterFN(this,event)" checked="true">Spanish<br>
+<img class="iconImg" src="img/Viking.webp" alt="Viking"><input type="checkbox" id="VikingCB" onclick="factionFilterFN(this,event)" checked="true">Viking<br>
+<input type="checkbox" id="UTCB" onclick="factionFilterFN(this,event)" checked="true">Unique Treasure<br>
+<input type="checkbox" id="NoneCB" onclick="factionFilterFN(this,event)" checked="true">Neutral<br>
 
 <div class="row"><div class="cardSPN" id="SPN-001"><img class="shipImg" src="img/SPN-001.jpg" alt="SPN-001"><div class="container"><p style="margin-left: 73px">Revenant<img class="iconImg" src="img/Pirate.webp" alt="Pirate"><br>Points: 15<br><img class="iconImg" src="img/Masts.webp" alt="Masts"> 5 <img class="iconImg" src="img/Cargo.webp" alt="Cargo"> 4 <img class="iconImg" src="img/Speed.webp" alt="Base Speed"> L<br><img class="iconImg" src="img/Cannons.webp" alt="Cannons"> <img class="dieImg" src="img/2L.png" alt="2L"> <img class="dieImg" src="img/2S.png" alt="2S"> <img class="dieImg" src="img/2S.png" alt="2S"> <img class="dieImg" src="img/2S.png" alt="2S"> <img class="dieImg" src="img/2L.png" alt="2L"><br>Other ships do not block this ship's line of fire.<br><i>The Revenant ("one who returns after death") is an appropriate name for the mysterious flagship of Capitán El Fantasma and his ghostly crew.</i></p></div><div class="triangleRare"><p>001</p></div></div></div>
 <div class="row"><div class="cardSPN" id="SPN-002"><img class="shipImg" src="img/SPN-002.jpg" alt="SPN-002"><div class="container"><p style="margin-left: 73px">Snipe<img class="iconImg" src="img/Pirate.webp" alt="Pirate"><br>Points: 6<br><img class="iconImg" src="img/Masts.webp" alt="Masts"> 1 <img class="iconImg" src="img/Cargo.webp" alt="Cargo"> 1 <img class="iconImg" src="img/Speed.webp" alt="Base Speed"> S+L<br><img class="iconImg" src="img/Cannons.webp" alt="Cannons"> <img class="dieImg" src="img/3S.png" alt="3S"><br>L-range cannons cannot hit this ship.<br><i>The Snipe is a fast and agile sloop whose speed is her best defense. Jack Hawkins used the Snipe to capture the Sea Nymph.</i></p></div><div class="triangleRare"><p>002</p></div></div></div>
@@ -2396,18 +2410,32 @@ function searchItemsFn() {
 	}//Obviously an empty search string matches everything
 }
 
-function filterFaction() {
-	var searchText = document.getElementById("factionItems").value;//Get the search string
+function factionFilterFN(cardID,event) {
+	var faction = cardID.id.replace("CB","")+".webp";//Get the triggering checkbox
+	var factionN = cardID.id.replace("CB","")+".png";//for the unusual case
+	//alert(cardID.checked);
 	var cardELEMENT = document.getElementsByClassName('row');//Get all of the cards
 	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
-		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(searchText.toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
-			cardELEMENT[x].hidden = false;//Hide the card
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(faction.toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
+			cardELEMENT[x].hidden = !(cardID.checked);//match the visibility of the card to the checkbox
 		}
-		else {//Otherwise...
-			cardELEMENT[x].hidden = true;//show the card
+	}
+	for (var x = 0; x < cardELEMENT.length; x++) {//Loop through each card
+		if(cardELEMENT[x].innerHTML.toUpperCase().indexOf(factionN.toUpperCase()) > -1) {//If there isn't a matching string in the HTML of the card...
+			cardELEMENT[x].hidden = !(cardID.checked);//match the visibility of the card to the checkbox
 		}
-	}//Obviously an empty search string matches everything
+		//else {//Otherwise...
+			//cardELEMENT[x].hidden = cardID.value;//show the card
+		//}
+	}
 }
+
+function getShareFn() {
+var searchText = document.getElementById("searchItems").value;//Get the search string
+document.getElementById("sharey").innerHTML ="https://tilorfire27.github.io/PiratesCSGDB/index.html?s="+searchText;
+document.getElementById("sharey").setAttribute('href','https://tilorfire27.github.io/PiratesCSGDB/index.html?s='+searchText);
+}
+
 function directLink() {
 var infoBucket=window.location.search.split('=');
 var searchBucket = infoBucket[1].replace("%20"," ");
