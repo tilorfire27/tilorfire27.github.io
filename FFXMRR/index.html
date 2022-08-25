@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>
+body {
+    background-color: #F3F3F3;
+	font-family: Times;
+	font-size: 20px;
+}
+  </style>
+<title>Tilor's Mushroom Rock Road Tool</title>
+</head>
+<body onload="setRun()">
+<h2>Mushroom Rock Road Tool</h2>
+Did you kill a Funguar last encounter? <span id="KimXP"><input type="checkbox" id="KimXPTF" name="KimXPTF" value="killedFunguar" onclick="setRun()" onkeyup="setRun()"></span><br>
+Funguar: <span id="funguarCheck"><input type="checkbox" id="FunguarTF" name="FunguarTF" value="funguar" onclick="setRun()" onkeyup="setRun()"></span><br>
+Gandarewa: <span id="GandarewaCheck"><input type="checkbox" id="GandarewaTF" name="GandarewaTF" value="Gandarewa" onclick="setRun()" onkeyup="setRun()"></span><br>
+Lamashtu: <span id="LamashtuCheck"><input type="checkbox" id="LamashtuTF" name="LamashtuTF" value="Lamashtu" onclick="setRun()" onkeyup="setRun()"></span><br>
+Raptor: <span id="RaptorCheck"><input type="checkbox" id="RaptorTF" name="RaptorTF" value="Raptor" onclick="setRun()" onkeyup="setRun()"></span><br>
+Red Element: <span id="RedElementCheck"><input type="checkbox" id="RedElementTF" name="RedElementTF" value="RedElement" onclick="setRun()" onkeyup="setRun()" checked></span><br>
+If you have a Garuda, just flee.<br><br>
+
+<div id="validCheck"><b style="color:red">YOU HAVE AN INVALID ENCOUNTER<br></b></div>
+<div id="step1">Switch <b style="color:blue;">Tidus</b> &rarr; <b style="color:#daa07c;">Kimahri</b><br></div>
+<div id="step2"><b style="color:#daa07c;">Kimahri</b>: Attack Lamashtu<br></div>
+<div id="step3"><b style="color:#daa07c;">Kimahri</b>: Defend<br></div>
+<div id="step4"><b style="color:blue;">Tidus</b>: Defend<br></div>
+<div id="step5"><b style="color:#f79634;">Wakka</b>: Attack Raptor<br></div>
+<div id="step6"><b style="color:#daa07c;">Kimahri</b>: Lancet Gandarewa<br></div>
+<div id="step7"><b style="color:#f79634;">Wakka</b>: Attack Gandarewa<br></div>
+<div id="step7a"><b>If Gandarewa is still alive, Flee</b><br></div>
+<div id="step8">Switch <b style="color:red;">Auron</b> &rarr; <b style="color:#808180;">Yuna</b><br></div>
+<div id="step9"><b style="color:#808180;">Yuna</b>: Summon <b style="color:#f6958c;">Valefor</b><br></div>
+<div id="step10"><b style="color:#f6958c;">Valefor</b>: Water Gandarewa<br></div>
+<div id="step11"><b style="color:#f6958c;">Valefor</b>: Fire Lamashtu<br></div>
+<div id="step12"><b style="color:#f6958c;">Valefor</b>: Fire Funguar<br></div>
+<div id="step13"><b style="color:#f6958c;">Valefor</b>: Boost<br></div>
+<div id="step14"><b style="color:#f6958c;">Valefor</b>: Blizzard Red Element<br></div>
+
+<script language="JavaScript">
+function setRun() {
+//var DailyXP = document.getElementById('PPH_Input').value * 24;
+var Funguar = document.getElementById('FunguarTF').checked;
+var Gandarewa = document.getElementById('GandarewaTF').checked;
+var Lamashtu = document.getElementById('LamashtuTF').checked;
+var Raptor = document.getElementById('RaptorTF').checked;
+var RedElement = document.getElementById('RedElementTF').checked;
+var chex = Funguar + Gandarewa + Lamashtu + Raptor;
+
+if (Lamashtu && Funguar || chex != 2) {
+document.getElementById('validCheck').style.display = 'block';
+}
+else {
+document.getElementById('validCheck').style.display = 'none';
+}
+
+
+if (Lamashtu || !document.getElementById('KimXPTF').checked || Funguar && Gandarewa) {
+document.getElementById('step1').style.display = 'block';
+}
+else {
+document.getElementById('step1').style.display = 'none';
+}
+if (Lamashtu) {
+document.getElementById('step2').style.display = 'block';
+}
+else {
+document.getElementById('step2').style.display = 'none';
+}
+if (Raptor && !document.getElementById('KimXPTF').checked && !Lamashtu) {
+document.getElementById('step3').style.display = 'block';
+}
+else {
+document.getElementById('step3').style.display = 'none';
+}
+if (Raptor && document.getElementById('KimXPTF').checked && !Lamashtu) {
+document.getElementById('step4').style.display = 'block';
+}
+else {
+document.getElementById('step4').style.display = 'none';
+}
+if (Raptor) {
+document.getElementById('step5').style.display = 'block';
+}
+else {
+document.getElementById('step5').style.display = 'none';
+}
+if (!Lamashtu && !document.getElementById('KimXPTF').checked && Gandarewa) {
+document.getElementById('step6').style.display = 'block';
+}
+else {
+document.getElementById('step6').style.display = 'none';
+}
+if (Gandarewa && !Raptor) {
+document.getElementById('step7').style.display = 'block';
+document.getElementById('step7a').style.display = 'block';
+}
+else {
+document.getElementById('step7').style.display = 'none';
+document.getElementById('step7a').style.display = 'none';
+}
+if (Raptor && Gandarewa) {
+document.getElementById('step10').style.display = 'block';
+}
+else {
+document.getElementById('step10').style.display = 'none';
+}
+if (Lamashtu) {
+document.getElementById('step11').style.display = 'block';
+}
+else {
+document.getElementById('step11').style.display = 'none';
+}
+if (Funguar) {
+document.getElementById('step12').style.display = 'block';
+}
+else {
+document.getElementById('step12').style.display = 'none';
+}
+
+
+}
+</script>
+</head>
