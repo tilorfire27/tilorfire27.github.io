@@ -330,37 +330,134 @@ text-align: center;
 #number {
 	width: 3em;
 }
+input[type=range] {
+  height: 21px;
+  -webkit-appearance: none;
+  margin: 10px 0;
+  width: 100%;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 9px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 0px 0px 0px #000000;
+  background: #B6B6B6;
+  border-radius: 24px;
+  border: 1px solid #8A8A8A;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #828282;
+  border: 1px solid #8A8A8A;
+  height: 13px;
+  width: 29px;
+  border-radius: 6px;
+  background: #DADADA;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -3px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #B6B6B6;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 9px;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 0px 0px 0px #000000;
+  background: #B6B6B6;
+  border-radius: 24px;
+  border: 1px solid #8A8A8A;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #828282;
+  border: 1px solid #8A8A8A;
+  height: 13px;
+  width: 29px;
+  border-radius: 6px;
+  background: #DADADA;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 9px;
+  cursor: pointer;
+  animate: 0.2s;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #B6B6B6;
+  border: 1px solid #8A8A8A;
+  border-radius: 48px;
+  box-shadow: 0px 0px 0px #000000;
+}
+input[type=range]::-ms-fill-upper {
+  background: #B6B6B6;
+  border: 1px solid #8A8A8A;
+  border-radius: 48px;
+  box-shadow: 0px 0px 0px #000000;
+}
+input[type=range]::-ms-thumb {
+  margin-top: 1px;
+  box-shadow: 1px 1px 1px #828282;
+  border: 1px solid #8A8A8A;
+  height: 13px;
+  width: 29px;
+  border-radius: 6px;
+  background: #DADADA;
+  cursor: pointer;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #B6B6B6;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #B6B6B6;
+}
+
+
 </style>
 <title>Tilor's Pirates Database</title>
 </head>
 <h2>Pirates Database</h2>
 <body onload="directLink()">
 <p>
-Check out <a href="https://www.instagram.com/meepleswoodworking/">@meepleswoodworking</a> on Instagram for more info about the creator. <br>
+Check out <a href="https://www.instagram.com/meepleswoodworking/">@meepleswoodworking</a> on Instagram or <a href="https://www.meepleswoodworking.com/">meepleswoodworking.com</a> for more info about the creator. <br>
 Big thanks to <a href="https://pirateswithben.com/">pirateswithben.com</a> for much of this information. <br>
 If you want to link a search to someone else, just add "?s=" and the text you want to search.<br>
 Example: https://tilorfire27.github.io/PiratesCSGDB/index.html<b>?s=DJC-001</b><br>
 <label for="searchItems">Search: </label>
-<input type="text" id="searchItems" name="searchItems" placeholder="Search..." onkeyup="searchItemsFn()" onclick="searchItemsFn()">
-<input type="button" value="Clear" onclick="clearSearchFn()"> <input type="button" value="Share" onclick="getShareFn()"><br>
-Points: *Coming Soon*<br>
-Masts: 0<input type="checkbox" name="mastsCB" id="masts0" onclick="searchItemsFn()" checked="true"> 1<input type="checkbox" name="mastsCB" id="masts1" onclick="searchItemsFn()" checked="true"> 2<input type="checkbox" name="mastsCB" id="masts2" onclick="searchItemsFn()" checked="true"> 3<input type="checkbox" name="mastsCB" id="masts3" onclick="searchItemsFn()" checked="true"> 4<input type="checkbox" name="mastsCB" id="masts4" onclick="searchItemsFn()" checked="true"> 5<input type="checkbox" name="mastsCB" id="masts5" onclick="searchItemsFn()" checked="true"> 6<input type="checkbox" name="mastsCB" id="masts6" onclick="searchItemsFn()" checked="true"> 8<input type="checkbox" name="mastsCB" id="masts8" onclick="searchItemsFn()" checked="true"> 10<input type="checkbox" name="mastsCB" id="masts10" onclick="searchItemsFn()" checked="true"> <br>
-Cargo: 0<input type="checkbox" name="cargoCB" id="cargo0" onclick="searchItemsFn()" checked="true"> 1<input type="checkbox" name="cargoCB" id="cargo1" onclick="searchItemsFn()" checked="true"> 2<input type="checkbox" name="cargoCB" id="cargo2" onclick="searchItemsFn()" checked="true"> 3<input type="checkbox" name="cargoCB" id="cargo3" onclick="searchItemsFn()" checked="true"> 4<input type="checkbox" name="cargoCB" id="cargo4" onclick="searchItemsFn()" checked="true"> 5<input type="checkbox" name="cargoCB" id="cargo5" onclick="searchItemsFn()" checked="true"> 6<input type="checkbox" name="cargoCB" id="cargo6" onclick="searchItemsFn()" checked="true"> 7<input type="checkbox" name="cargoCB" id="cargo7" onclick="searchItemsFn()" checked="true"> 8<input type="checkbox" name="cargoCB" id="cargo8" onclick="searchItemsFn()" checked="true"> 10<input type="checkbox" name="cargoCB" id="cargo10" onclick="searchItemsFn()" checked="true"><br>
-Base Speed: None<input type="checkbox" name="speedCB" id="speed0" onclick="searchItemsFn()" checked="true"> S<input type="checkbox" name="speedCB" id="speedS" onclick="searchItemsFn()" checked="true"> L<input type="checkbox" name="speedCB" id="speedL" onclick="searchItemsFn()" checked="true"> S+S<input type="checkbox" name="speedCB" id="speedSS" onclick="searchItemsFn()" checked="true"> S+L<input type="checkbox" name="speedCB" id="speedSL" onclick="searchItemsFn()" checked="true"> S+S+S<input type="checkbox" name="speedCB" id="speedSSS" onclick="searchItemsFn()" checked="true"> L+L<input type="checkbox" name="speedCB" id="speedLL" onclick="searchItemsFn()" checked="true"> D<input type="checkbox" name="speedCB" id="speedD" onclick="searchItemsFn()" checked="true"> T<input type="checkbox" name="speedCB" id="speedT" onclick="searchItemsFn()" checked="true"><br>
+<input type="text" id="searchItems" name="searchItems" placeholder="Search...">
+<input type="button" value="Search" onclick="searchItemsFn()"> <input type="button" value="Clear" onclick="clearSearchFn()"> <input type="button" value="Share" onclick="getShareFn()"><br>
+Points Min: <a id="pointsMinValue">0</a>  Points Max: <a id="pointsMaxValue">35</a><br>
+<input style="width: 100px" type="range" id="pointsMin" name="pointsMin" min="0" max="35" oninput="pointsMinValue.innerText = this.value"> <input style="width: 100px" type="range" id="pointsMax" name="pointsMax" min="0" max="35" oninput="pointsMaxValue.innerText = this.value"><br>
+
+Masts Min: <a id="mastsMinValue">0</a>  Masts Max: <a id="mastsMaxValue">10</a><br>
+<input style="width: 100px" type="range" id="mastsMin" name="mastsMin" min="0" max="10" oninput="mastsMinValue.innerText = this.value"> <input style="width: 100px" type="range" id="mastsMax" name="mastsMax" min="0" max="10" oninput="mastsMaxValue.innerText = this.value"><br>
+
+Cargo Min: <a id="cargoMinValue">0</a>  Cargo Max: <a id="cargoMaxValue">10</a><br>
+<input style="width: 100px" type="range" id="cargoMin" name="cargoMin" min="0" max="10" oninput="cargoMinValue.innerText = this.value"> <input style="width: 100px" type="range" id="cargoMax" name="cargoMax" min="0" max="10" oninput="cargoMaxValue.innerText = this.value"><br>
+
+Base Speed: None<input type="checkbox" name="speedCB" id="speed0" checked="true"> S<input type="checkbox" name="speedCB" id="speedS" checked="true"> L<input type="checkbox" name="speedCB" id="speedL" checked="true"> S+S<input type="checkbox" name="speedCB" id="speedSS" checked="true"> S+L<input type="checkbox" name="speedCB" id="speedSL" checked="true"> S+S+S<input type="checkbox" name="speedCB" id="speedSSS" checked="true"> L+L<input type="checkbox" name="speedCB" id="speedLL" checked="true"> D<input type="checkbox" name="speedCB" id="speedD" checked="true"> T<input type="checkbox" name="speedCB" id="speedT" checked="true"><br>
 Faction: <br>
-<img class="iconImg lazy" data-src="img/American.png" alt="American"><input type="radio" name="factionRd" id="AmericanCB" onclick="searchItemsFn()" checked="false" value="American.png">American<br>
-<img class="iconImg lazy" data-src="img/Barbary Corsair.png" alt="Barbary Corsair"><input type="radio" name="factionRd" id="Barbary CorsairCB" onclick="searchItemsFn()" checked="false" value="Barbary Corsair.png">Barbary Corsair<br>
-<img class="iconImg lazy" data-src="img/Cursed.png" alt="Cursed"><input type="radio" name="factionRd" id="CursedCB" onclick="searchItemsFn()" checked="false" value="Cursed.png">Cursed<br>
-<img class="iconImg lazy" data-src="img/English.png" alt="English"><input type="radio" name="factionRd" id="EnglishCB" onclick="searchItemsFn()" checked="false" value="English.png">English<br>
-<img class="iconImg lazy" data-src="img/French.png" alt="French"><input type="radio" name="factionRd" id="FrenchCB" onclick="searchItemsFn()" checked="false" value="French.png">French<br>
-<img class="iconImg lazy" data-src="img/Jade Rebellion.png" alt="Jade Rebellion"><input type="radio" name="factionRd" id="Jade RebellionCB" onclick="searchItemsFn()" checked="false" value="Jade Rebellion.png">Jade Rebellion<br>
-<img class="iconImg lazy" data-src="img/Mercenary.png" alt="Mercenary"><input type="radio" name="factionRd" id="MercenaryCB" onclick="searchItemsFn()" checked="false" value="Mercenary.png">Mercenary<br>
-<img class="iconImg lazy" data-src="img/Pirate.png" alt="Pirate"><input type="radio" name="factionRd" id="PirateCB" onclick="searchItemsFn()" checked="false" value="Pirate.png">Pirate<br>
-<img class="iconImg lazy" data-src="img/Spanish.png" alt="Spanish"><input type="radio" name="factionRd" id="SpanishCB" onclick="searchItemsFn()" checked="false" value="Spanish.png">Spanish<br>
-<img class="iconImg lazy" data-src="img/Viking.png" alt="Viking"><input type="radio" name="factionRd" id="VikingCB" onclick="searchItemsFn()" checked="false" value="Viking.png">Viking<br>
-<input type="radio" name="factionRd" id="UTCB" onclick="searchItemsFn()" checked="false" value="UT.png">Unique Treasure<br>
-<input type="radio" name="factionRd" id="NoneCB" onclick="searchItemsFn()" checked="false" value="None.png">Neutral<br>
-<input type="radio" name="factionRd" id="AllCB" onclick="searchItemsFn()" checked="true" value=" ">All<br>
+<img class="iconImg lazy" data-src="img/American.png" alt="American"><input type="radio" name="factionRd" id="AmericanCB" checked="false" value="American.png">American<br>
+<img class="iconImg lazy" data-src="img/Barbary Corsair.png" alt="Barbary Corsair"><input type="radio" name="factionRd" id="Barbary CorsairCB" checked="false" value="Barbary Corsair.png">Barbary Corsair<br>
+<img class="iconImg lazy" data-src="img/Cursed.png" alt="Cursed"><input type="radio" name="factionRd" id="CursedCB" checked="false" value="Cursed.png">Cursed<br>
+<img class="iconImg lazy" data-src="img/English.png" alt="English"><input type="radio" name="factionRd" id="EnglishCB" checked="false" value="English.png">English<br>
+<img class="iconImg lazy" data-src="img/French.png" alt="French"><input type="radio" name="factionRd" id="FrenchCB" checked="false" value="French.png">French<br>
+<img class="iconImg lazy" data-src="img/Jade Rebellion.png" alt="Jade Rebellion"><input type="radio" name="factionRd" id="Jade RebellionCB" checked="false" value="Jade Rebellion.png">Jade Rebellion<br>
+<img class="iconImg lazy" data-src="img/Mercenary.png" alt="Mercenary"><input type="radio" name="factionRd" id="MercenaryCB" checked="false" value="Mercenary.png">Mercenary<br>
+<img class="iconImg lazy" data-src="img/Pirate.png" alt="Pirate"><input type="radio" name="factionRd" id="PirateCB" checked="false" value="Pirate.png">Pirate<br>
+<img class="iconImg lazy" data-src="img/Spanish.png" alt="Spanish"><input type="radio" name="factionRd" id="SpanishCB" checked="false" value="Spanish.png">Spanish<br>
+<img class="iconImg lazy" data-src="img/Viking.png" alt="Viking"><input type="radio" name="factionRd" id="VikingCB" checked="false" value="Viking.png">Viking<br>
+<input type="radio" name="factionRd" id="UTCB" checked="false" value="UT.png">Unique Treasure<br>
+<input type="radio" name="factionRd" id="NoneCB" checked="false" value="None.png">Neutral<br>
+<input type="radio" name="factionRd" id="AllCB" checked="true" value=" ">All<br>
 Shareable link: <a id="sharey" href="https://tilorfire27.github.io/PiratesCSGDB/index.html?s=BC-088">https://tilorfire27.github.io/PiratesCSGDB/index.html?s=BC-088</a><br>
 
 <div class="row"><div class="cardSPN" id="SPN-001"><img class="shipImg lazy" data-src="img/SPN-001.jpg" alt="SPN-001"><div class="container"><p style="margin-left: 73px">Revenant<img class="iconImg lazy" data-src="img/Pirate.png" alt="Pirate"><br>Points: 15<br><img class="iconImg lazy" data-src="img/Masts.png" alt="Masts"><data name="masts" value="5"> 5 </data><img class="iconImg lazy" data-src="img/Cargo.png" alt="Cargo"><data name="cargo" value="4"> 4 </data><img class="iconImg lazy" data-src="img/Speed.png" alt="Base Speed"><data name="speed" value="L"> L</data><br><img class="iconImg lazy" data-src="img/Cannons.png" alt="Cannons"> <img class="dieImg lazy" data-src="img/2L.png" alt="2L"> <img class="dieImg lazy" data-src="img/2S.png" alt="2S"> <img class="dieImg lazy" data-src="img/2S.png" alt="2S"> <img class="dieImg lazy" data-src="img/2S.png" alt="2S"> <img class="dieImg lazy" data-src="img/2L.png" alt="2L"><br>Other ships do not block this ship's line of fire.<br><i>The Revenant ("one who returns after death") is an appropriate name for the mysterious flagship of Capitán El Fantasma and his ghostly crew.</i></p></div><div class="triangleRare"><p>001</p></div></div></div>
@@ -2418,6 +2515,7 @@ searchItemsFn();
 //Search function that hides everything that doesn't match the search
 function searchItemsFn() {
 	var searchText = document.getElementById("searchItems").value.toUpperCase();//Get the search string
+	//FACTIONS----
 	var faction = document.getElementsByName("factionRd");//Get the Faction Filter
 	for (var z = 0; z < faction.length; z++) {
 		if(faction[z].checked) {
@@ -2431,16 +2529,21 @@ function searchItemsFn() {
 		//MASTS----
 		var cardMasts = 0;//Set the matching masts to 0, if nothing ends up matching, this is the "default"
 			//console.log(cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[6]);
+		var minMasts = document.getElementById("mastsMin").value;
+		var maxMasts = document.getElementById("mastsMax").value;
 		for (var m = 1; m < 11; m++) {//From masts 1 to 10, since there are no 0-mast 
 			var cardMastsCheck = (cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[6].value == m);//if there is a mast, here's where its located, what value is it?
 			if (cardMastsCheck) {//We have to do this whole thing to be able to make sure the value can be 0 rather than an error
 				cardMasts = m;
 			}
 		}
-		var cbMasts = document.getElementById("masts"+cardMasts).checked;//Now find out if the matching masts checkbox is checked
+		
+		var cbMasts = (cardMasts >= minMasts) && (cardMasts <= maxMasts);//Now find out if the matching masts is in range
 		//CARGO----
 		var cardCargo = 0;//Set the matching cargo to 0, if nothing ends up matching, this is the "default"
 			//console.log(cardELEMENT[x].childNodes[0]);
+		var minCargo = document.getElementById("cargoMin").value;
+		var maxCargo = document.getElementById("cargoMax").value;
 		try {
 			for (var m = 1; m < 11; m++) {//From cargo 1 to 10, if it doesnt match, its 0 anyways
 				var cardCargoCheck = (cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[8].value == m);//if there is a cargo, here's where its located, what value is it?
@@ -2453,7 +2556,7 @@ function searchItemsFn() {
 			cardCargo = 0;
 		}
 		//console.log(cardCargo);
-		var cbCargo = document.getElementById("cargo"+cardCargo).checked;//Now find out if the matching cargo checkbox is checked
+		var cbCargo = (cardCargo >= minCargo) && (cardCargo <= maxCargo);//Now find out if the matching cargo is in range
 		//SPEEED----
 		var cardSpeed = 0;//Set the matching masts to 0, if nothing ends up matching, this is the "default"
 			try {
