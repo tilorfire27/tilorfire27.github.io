@@ -435,13 +435,16 @@ Example: https://tilorfire27.github.io/PiratesCSGDB/index.html<b>?s=DJC-001</b><
 <input type="text" id="searchItems" name="searchItems" placeholder="Search...">
 <input type="button" value="Search" onclick="searchItemsFn()"> <input type="button" value="Clear" onclick="clearSearchFn()"> <input type="button" value="Share" onclick="getShareFn()"><br>
 Points Min: <a id="pointsMinValue">0</a>  Points Max: <a id="pointsMaxValue">35</a><br>
-<input style="width: 100px" type="range" id="pointsMin" name="pointsMin" min="0" max="35" oninput="pointsMinValue.innerText = this.value"> <input style="width: 100px" type="range" id="pointsMax" name="pointsMax" min="0" max="35" oninput="pointsMaxValue.innerText = this.value"><br>
+<input style="width: 100px" type="range" id="pointsMin" name="pointsMin" min="0" max="35" value="0" oninput="pointsMinValue.innerText = this.value"> 
+<input style="width: 100px" type="range" id="pointsMax" name="pointsMax" min="0" max="35" value="35" oninput="pointsMaxValue.innerText = this.value"><br>
 
 Masts Min: <a id="mastsMinValue">0</a>  Masts Max: <a id="mastsMaxValue">10</a><br>
-<input style="width: 100px" type="range" id="mastsMin" name="mastsMin" min="0" max="10" oninput="mastsMinValue.innerText = this.value"> <input style="width: 100px" type="range" id="mastsMax" name="mastsMax" min="0" max="10" oninput="mastsMaxValue.innerText = this.value"><br>
+<input style="width: 100px" type="range" id="mastsMin" name="mastsMin" min="0" max="10" value="0" oninput="mastsMinValue.innerText = this.value"> 
+<input style="width: 100px" type="range" id="mastsMax" name="mastsMax" min="0" max="10" value="10" oninput="mastsMaxValue.innerText = this.value"><br>
 
 Cargo Min: <a id="cargoMinValue">0</a>  Cargo Max: <a id="cargoMaxValue">10</a><br>
-<input style="width: 100px" type="range" id="cargoMin" name="cargoMin" min="0" max="10" oninput="cargoMinValue.innerText = this.value"> <input style="width: 100px" type="range" id="cargoMax" name="cargoMax" min="0" max="10" oninput="cargoMaxValue.innerText = this.value"><br>
+<input style="width: 100px" type="range" id="cargoMin" name="cargoMin" min="0" max="10" value="0" oninput="cargoMinValue.innerText = this.value"> 
+<input style="width: 100px" type="range" id="cargoMax" name="cargoMax" min="0" max="10" value="10" oninput="cargoMaxValue.innerText = this.value"><br>
 
 Base Speed: None<input type="checkbox" name="speedCB" id="speed0" checked="true"> S<input type="checkbox" name="speedCB" id="speedS" checked="true"> L<input type="checkbox" name="speedCB" id="speedL" checked="true"> S+S<input type="checkbox" name="speedCB" id="speedSS" checked="true"> S+L<input type="checkbox" name="speedCB" id="speedSL" checked="true"> S+S+S<input type="checkbox" name="speedCB" id="speedSSS" checked="true"> L+L<input type="checkbox" name="speedCB" id="speedLL" checked="true"> D<input type="checkbox" name="speedCB" id="speedD" checked="true"> T<input type="checkbox" name="speedCB" id="speedT" checked="true"><br>
 Faction: <br>
@@ -2495,25 +2498,46 @@ updateTotals();
 //clears the search box
 function clearSearchFn() {
 document.getElementById("searchItems").value = "";
-var mastsReset = document.getElementsByName("mastsCB");
-for (i = 0; i < mastsReset.length; i++) {
-	mastsReset[i].checked = true;
-}
-
-var cargoReset = document.getElementsByName("cargoCB");
-for (i = 0; i < cargoReset.length; i++) {
-	cargoReset[i].checked = true;
-}
-
-var speedReset = document.getElementsByName("speedCB");
-for (i = 0; i < speedReset.length; i++) {
-	speedReset[i].checked = true;
-}
+document.getElementById("pointsMin").value = 0;
+document.getElementById("pointsMax").value = 35;
+document.getElementById("mastsMin").value = 0;
+document.getElementById("mastsMax").value = 10;
+document.getElementById("cargoMin").value = 0;
+document.getElementById("cargoMax").value = 10;
+document.getElementById("pointsMaxValue").innerText = 35;
+document.getElementById("pointsMinValue").innerText = 0;
+document.getElementById("mastsMaxValue").innerText = 10;
+document.getElementById("mastsMinValue").innerText = 0;
+document.getElementById("cargoMaxValue").innerText = 10;
+document.getElementById("cargoMinValue").innerText = 0;
 searchItemsFn();
 }
 
 //Search function that hides everything that doesn't match the search
 function searchItemsFn() {
+//Fix any sliders that are weird ranges
+		var minPoints = parseInt(document.getElementById("pointsMin").value);
+		var maxPoints = parseInt(document.getElementById("pointsMax").value);
+		var minMasts = parseInt(document.getElementById("mastsMin").value);
+		var maxMasts = parseInt(document.getElementById("mastsMax").value);
+		var minCargo = parseInt(document.getElementById("cargoMin").value);
+		var maxCargo = parseInt(document.getElementById("cargoMax").value);
+	
+	if (maxPoints < minPoints) {
+	document.getElementById("pointsMax").value = minPoints;
+	document.getElementById("pointsMaxValue").innerText = minPoints;
+	}
+	
+	if (maxMasts < minMasts) {
+	document.getElementById("mastsMax").value = minMasts;
+	document.getElementById("mastsMaxValue").innerText = minMasts;
+	}
+	
+	if (maxCargo < minCargo) {
+	document.getElementById("cargoMax").value = minCargo;
+	document.getElementById("cargoMaxValue").innerText = minCargo;
+	}
+
 	var searchText = document.getElementById("searchItems").value.toUpperCase();//Get the search string
 	//FACTIONS----
 	var faction = document.getElementsByName("factionRd");//Get the Faction Filter
@@ -2529,8 +2553,7 @@ function searchItemsFn() {
 		//MASTS----
 		var cardMasts = 0;//Set the matching masts to 0, if nothing ends up matching, this is the "default"
 			//console.log(cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[6]);
-		var minMasts = document.getElementById("mastsMin").value;
-		var maxMasts = document.getElementById("mastsMax").value;
+
 		for (var m = 1; m < 11; m++) {//From masts 1 to 10, since there are no 0-mast 
 			var cardMastsCheck = (cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[7].value == m);//if there is a mast, here's where its located, what value is it?
 			if (cardMastsCheck) {//We have to do this whole thing to be able to make sure the value can be 0 rather than an error
@@ -2541,8 +2564,7 @@ function searchItemsFn() {
 		var cbMasts = (cardMasts >= minMasts) && (cardMasts <= maxMasts);//Now find out if the matching masts is in range
 		//POINTS----
 		var cardPoints = 0;//Set the matching masts to 0, if nothing ends up matching, this is the "default"
-		var minPoints = document.getElementById("pointsMin").value;
-		var maxPoints = document.getElementById("pointsMax").value;
+
 		for (var m = 1; m < 36; m++) {//From points 0 to 35 
 			var cardPointsCheck = (cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[4].value == m);//if there is a mast, here's where its located, what value is it?
 			if (cardPointsCheck) {//We have to do this whole thing to be able to make sure the value can be 0 rather than an error
@@ -2554,8 +2576,7 @@ function searchItemsFn() {
 		//CARGO----
 		var cardCargo = 0;//Set the matching cargo to 0, if nothing ends up matching, this is the "default"
 			//console.log(cardELEMENT[x].childNodes[0]);
-		var minCargo = document.getElementById("cargoMin").value;
-		var maxCargo = document.getElementById("cargoMax").value;
+
 		try {
 			for (var m = 1; m < 11; m++) {//From cargo 1 to 10, if it doesnt match, its 0 anyways
 				var cardCargoCheck = (cardELEMENT[x].childNodes[0].childNodes[1].childNodes[0].childNodes[9].value == m);//if there is a cargo, here's where its located, what value is it?
@@ -2598,6 +2619,12 @@ document.getElementById("sharey").setAttribute('href','https://tilorfire27.githu
 }
 
 function directLink() {
+document.getElementById("pointsMax").value = 35;
+document.getElementById("pointsMin").value = 0;
+document.getElementById("mastsMax").value = 10;
+document.getElementById("mastsMin").value = 0;
+document.getElementById("cargoMax").value = 10;
+document.getElementById("cargoMin").value = 0;
 var infoBucket=window.location.search.split('=');
 var searchBucket = infoBucket[1].replace("%20"," ");
 document.getElementById("searchItems").value = searchBucket;
